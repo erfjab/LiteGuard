@@ -1,3 +1,3 @@
-from .env import DEBUG
+from .env import DEBUG, SQLALCHEMY_DATABASE_URL
 
-__all__ = ["DEBUG"]
+__all__ = ["DEBUG", "SQLALCHEMY_DATABASE_URL"]
