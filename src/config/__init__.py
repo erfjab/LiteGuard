@@ -1,3 +1,18 @@
-from .env import DEBUG, SQLALCHEMY_DATABASE_URL
+from .env import (
+    DEBUG,
+    SQLALCHEMY_DATABASE_URL,
+    TELEGRAM_ADMINS_ID,
+    TELEGRAM_API_TOKEN,
+    TELEGRAM_LOGGER_GROUP_ID,
+)
+from .tg import BOT, DP
 
-__all__ = ["DEBUG", "SQLALCHEMY_DATABASE_URL"]
+__all__ = [
+    "DEBUG",
+    "SQLALCHEMY_DATABASE_URL",
+    "TELEGRAM_ADMINS_ID",
+    "TELEGRAM_API_TOKEN",
+    "TELEGRAM_LOGGER_GROUP_ID",
+    "BOT",
+    "DP",
+]

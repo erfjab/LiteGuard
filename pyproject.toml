@@ -8,6 +8,7 @@ dependencies = [
     "alembic>=1.16.5",
     "asyncpg>=0.30.0",
     "dotenv>=0.9.9",
+    "eiogram>=2.1.0",
     "python-decouple>=3.8",
     "sqlalchemy[asyncio]>=2.0.43",
 ]

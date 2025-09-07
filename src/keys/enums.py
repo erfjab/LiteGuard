@@ -1,0 +1,24 @@
+from enum import StrEnum
+
+
+class SectionType(StrEnum):
+    HOME = "hm"
+    SERVERS = "sv"
+    STATS = "st"
+    USERS = "us"
+    SUBS = "sb"
+    SETTING = "stg"
+    API_KEYS = "ak"
+    TEST = "tt"
+    ISSUE = "is"
+
+
+class ActionType(StrEnum):
+    MENU = "mn"
+    INFO = "nf"
+    CREATE = "cr"
+    UPDATE = "up"
+    LIST = "ls"
+
+
+class SubActionType(StrEnum): ...
