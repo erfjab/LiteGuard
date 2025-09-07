@@ -13,9 +13,6 @@ from src.utils.pagination import Pagination
 from ..core import Base, GetDB
 
 
-logger = logging.getLogger(__name__)
-
-
 class UserState(Base):
     __tablename__ = "user_states"
 
@@ -65,7 +62,7 @@ class UserMessage(Base):
                 try:
                     await BOT.delete_messages(chat_id=user_id, message_ids=message_ids)
                 except Exception as e:
-                    logger.warning(f"Failed to delete messages: {e}")
+                    logging.warning(f"Failed to delete messages: {e}")
             await db.execute(delete(UserMessage).where(delete_condition))
             message = update.message if isinstance(update, CallbackQuery) else update
             db.add(UserMessage(user_id=message.chat.id, message_id=message.message_id))
