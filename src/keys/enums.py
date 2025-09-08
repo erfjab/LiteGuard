@@ -21,4 +21,8 @@ class ActionType(StrEnum):
     LIST = "ls"
 
 
-class SubActionType(StrEnum): ...
+class SubActionType(StrEnum):
+    REMARK = "rm"
+    CHANGE_CONFIG = "cc"
+    ENABLED_STATUS = "es"
+    REMOVE = "rv"
