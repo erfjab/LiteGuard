@@ -3,9 +3,12 @@ from eiogram.types import BotCommand
 from src.config import BOT, DP, TELEGRAM_ADMINS_ID
 from src.handlers import setup_handlers
 from src.utils.state import DatabaseStorage
+from src.tasks import TaskManager
 
 
 async def main():
+    logging.info("Startup Tasks.")
+    await TaskManager.start()
     logging.info("Configuring bot.")
     await BOT.delete_webhook()
     logging.info("Deleted bot webhook.")
@@ -23,3 +26,5 @@ async def main():
     bot_data = await BOT.get_me()
     logging.info(f"Ready to start polling as @{bot_data.username}")
     await DP.run_polling(interval=1, timeout=1)
+    logging.info("Tasks stopped.")
+    await TaskManager.stop()
