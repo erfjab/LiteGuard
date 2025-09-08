@@ -200,6 +200,8 @@ dependencies = [
     { name = "asyncpg" },
     { name = "dotenv" },
     { name = "eiogram" },
+    { name = "httpx" },
+    { name = "pydantic" },
     { name = "python-decouple" },
     { name = "sqlalchemy", extra = ["asyncio"] },
 ]
@@ -210,6 +212,8 @@ requires-dist = [
     { name = "asyncpg", specifier = ">=0.30.0" },
     { name = "dotenv", specifier = ">=0.9.9" },
     { name = "eiogram", specifier = ">=2.1.0" },
+    { name = "httpx", specifier = ">=0.28.1" },
+    { name = "pydantic", specifier = ">=2.11.7" },
     { name = "python-decouple", specifier = ">=3.8" },
     { name = "sqlalchemy", extras = ["asyncio"], specifier = ">=2.0.43" },
 ]
