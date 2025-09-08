@@ -1,10 +1,11 @@
 from typing import List, Optional, Dict
 from eiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from eiogram.utils import InlineKeyboardBuilder
-from .callbacks import BotCB
-from .enums import SectionType, ActionType
+from src.db import Server
 from src.utils.pagination import Pagination
 from src.lang import ButtonText
+from .callbacks import BotCB
+from .enums import SectionType, ActionType, SubActionType
 
 
 class BotKB:
@@ -144,4 +145,51 @@ class BotKB:
         kb.add(text=ButtonText.OWNER, url="https://t.me/erfjabs")
         kb.add(text=ButtonText.ISSUE, url="https://github.com/erfjab/LiteGuard/issues")
         kb.adjust(1, 2, 1, 2, 1, 2)
+        return kb.as_markup()
+
+    @classmethod
+    def servers_menu(cls, pagination: Pagination) -> InlineKeyboardMarkup:
+        return cls._menu(
+            items={item.kb_remark: item.id for item in pagination.items},
+            section=SectionType.SERVERS,
+            pagination=pagination,
+        )
+
+    @classmethod
+    def servers_update(cls, item: Server) -> InlineKeyboardMarkup:
+        return cls._update(
+            section=SectionType.SERVERS,
+            target=item.id,
+            updates={
+                SubActionType.REMARK: ButtonText.REMARK,
+                SubActionType.ENABLED_STATUS: ButtonText.DEACTIVATED
+                if item.enabled
+                else ButtonText.ACTIVATED,
+                SubActionType.CHANGE_CONFIG: ButtonText.CHANGE_CONFIG,
+                SubActionType.REMOVE: ButtonText.REMOVE,
+            },
+        )
+
+    @classmethod
+    def servers_back(cls, target: Optional[int | str] = None) -> InlineKeyboardMarkup:
+        return cls._back_generate(section=SectionType.SERVERS, target=target)
+
+    @classmethod
+    def approval(
+        cls,
+        section: SectionType,
+        action: ActionType = ActionType.UPDATE,
+        target: Optional[int] = None,
+    ):
+        kb = InlineKeyboardBuilder()
+        kb.add(
+            text=ButtonText.ACTIONS_CONFIRM,
+            callback_data=BotCB(section=section, action=action, approval=True).pack(),
+        )
+        kb.add(
+            text=ButtonText.ACTIONS_CANCEL,
+            callback_data=BotCB(section=section, action=action, approval=False).pack(),
+        )
+        kb.adjust(2)
+        kb.row(cls._back(section=section, target=target), size=1)
         return kb.as_markup()

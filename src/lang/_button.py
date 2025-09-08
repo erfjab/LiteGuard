@@ -5,6 +5,8 @@ class ButtonText(StrEnum):
     ### actions
     ACTIONS_BACK = "🔙 Back"
     ACTIONS_CREATE = "➕ Create"
+    ACTIONS_CONFIRM = "✅ Confirm"
+    ACTIONS_CANCEL = "❌ Cancel"
 
     ### pages
     PAGES_BACK = "⬅️"
@@ -20,3 +22,10 @@ class ButtonText(StrEnum):
     TEST = "🧪 Test"
     OWNER = "🌚  Owner"
     ISSUE = "🐞 Report Issue"
+
+    ### SubActions
+    REMARK = "📝 Remark"
+    CHANGE_CONFIG = "⚙️ Change Config"
+    ACTIVATED = "✔️ Activated"
+    DEACTIVATED = "✖️ Deactivated"
+    REMOVE = "🗑️ Remove"
