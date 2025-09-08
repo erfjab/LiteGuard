@@ -1,5 +1,5 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional, List, Dict
 
 from sqlalchemy import (
@@ -71,6 +71,12 @@ class Server(Base):
         return None
 
     @property
+    def need_update_access(self) -> bool:
+        if not self.cookies:
+            return True
+        return self.server_access.updated_at > timedelta(hours=8)
+
+    @property
     def host(self) -> Optional[str]:
         return self.config.get("host") if self.config else None
 
@@ -89,10 +95,6 @@ class Server(Base):
     @property
     def kb_remark(self) -> str:
         return f"{self.emoji} {self.remark} [{self.id}]"
-
-    @property
-    def access(self) -> Optional[str]:
-        return self.server_access.access if self.server_access else None
 
     def format(self) -> Dict[str, str]:
         return {
