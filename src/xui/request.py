@@ -55,14 +55,8 @@ class XUIRequest:
 
     @classmethod
     async def get_inbounds(cls, host: str, cookies: dict) -> Optional[List[Inbound]]:
-        inbounds = await cls._send(
-            url=f"{host}/panel/api/inbounds/list", method="GET", cookies=cookies
-        )
-        return (
-            [Inbound(**item) for item in inbounds["obj"]]
-            if inbounds["success"]
-            else None
-        )
+        inbounds = await cls._send(url=f"{host}/panel/api/inbounds/list", method="GET", cookies=cookies)
+        return [Inbound(**item) for item in inbounds["obj"]] if inbounds["success"] else None
 
     @classmethod
     async def create_client(
@@ -71,9 +65,8 @@ class XUIRequest:
         cookies: dict,
         inbound_id: int,
         clients: List[ClientRequest],
-    ) -> Dict[str, str]:
-        print(client.id for client in clients)
-        return await cls._send(
+    ) -> bool:
+        result = await cls._send(
             url=f"{host}/panel/api/inbounds/addClient",
             method="POST",
             cookies=cookies,
@@ -96,12 +89,11 @@ class XUIRequest:
                 ),
             },
         )
+        return True if result["success"] else False
 
     @classmethod
-    async def deactivate_client(
-        cls, host: str, cookies: dict, inbound_id: int, client_id: str
-    ) -> Dict[str, str]:
-        return await cls._send(
+    async def deactivate_client(cls, host: str, cookies: dict, inbound_id: int, client_id: str) -> bool:
+        result = await cls._send(
             url=f"{host}/panel/api/inbounds/updateClient/{client_id}",
             method="POST",
             cookies=cookies,
@@ -123,12 +115,11 @@ class XUIRequest:
                 ),
             },
         )
+        return True if result["success"] else False
 
     @classmethod
-    async def activate_client(
-        cls, host: str, cookies: dict, inbound_id: int, client_id: str
-    ) -> Dict[str, str]:
-        return await cls._send(
+    async def activate_client(cls, host: str, cookies: dict, inbound_id: int, client_id: str) -> bool:
+        result = await cls._send(
             url=f"{host}/panel/api/inbounds/updateClient/{client_id}",
             method="POST",
             cookies=cookies,
@@ -150,6 +141,7 @@ class XUIRequest:
                 ),
             },
         )
+        return True if result["success"] else False
 
     @classmethod
     async def revoke_client(
@@ -159,8 +151,8 @@ class XUIRequest:
         inbound_id: int,
         client_id: str,
         client: ClientRequest,
-    ) -> Dict[str, str]:
-        return await cls._send(
+    ) -> bool:
+        result = await cls._send(
             url=f"{host}/panel/api/inbounds/updateClient/{client_id}",
             method="POST",
             cookies=cookies,
@@ -182,23 +174,22 @@ class XUIRequest:
                 ),
             },
         )
+        return True if result["success"] else False
 
     @classmethod
-    async def remove_client(
-        cls, host: str, cookies: dict, inbound_id: int, client_id: str
-    ) -> Dict[str, str]:
-        return await cls._send(
+    async def remove_client(cls, host: str, cookies: dict, inbound_id: int, client_id: str) -> bool:
+        result = await cls._send(
             url=f"{host}/panel/api/inbounds/{inbound_id}/delClient/{client_id}",
             method="POST",
             cookies=cookies,
         )
+        return True if result["success"] else False
 
     @classmethod
-    async def reset_client(
-        cls, host: str, cookies: dict, inbound_id: int, client_id: str
-    ) -> Dict[str, str]:
-        return await cls._send(
+    async def reset_client(cls, host: str, cookies: dict, inbound_id: int, client_id: str) -> bool:
+        result = await cls._send(
             url=f"{host}/panel/api/inbounds/{inbound_id}/resetClientTraffic/{client_id}",
             method="POST",
             cookies=cookies,
         )
+        return True if result["success"] else False

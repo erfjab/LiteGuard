@@ -12,7 +12,5 @@ router = Router()
 
 @router.message(Command("start"), IgnoreStateFilter())
 async def start_handler(message: Message, _: ClearState):
-    update = await message.answer(
-        text=DialogText.COMMANDS_START, reply_markup=BotKB.home()
-    )
+    update = await message.answer(text=DialogText.COMMANDS_START, reply_markup=BotKB.home())
     return await UserMessage.clear(update)

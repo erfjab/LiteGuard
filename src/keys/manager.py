@@ -1,7 +1,7 @@
 from typing import List, Optional, Dict
 from eiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from eiogram.utils import InlineKeyboardBuilder
-from src.db import Server
+from src.db import Server, Subscription
 from src.utils.pagination import Pagination
 from src.lang import ButtonText
 from .callbacks import BotCB
@@ -110,17 +110,13 @@ class BotKB:
         buttons.append(
             InlineKeyboardButton(
                 text=ButtonText.PAGES_BACK if pagination.back else "     ",
-                callback_data=BotCB(section=section, action=action).pack()
-                if pagination.back
-                else "_",
+                callback_data=BotCB(section=section, action=action).pack() if pagination.back else "_",
             )
         )
         buttons.append(
             InlineKeyboardButton(
                 text=ButtonText.PAGES_NEXT if pagination.next else "     ",
-                callback_data=BotCB(section=section, action=action).pack()
-                if pagination.next
-                else "_",
+                callback_data=BotCB(section=section, action=action).pack() if pagination.next else "_",
             )
         )
         return buttons
@@ -162,9 +158,7 @@ class BotKB:
             target=item.id,
             updates={
                 SubActionType.REMARK: ButtonText.REMARK,
-                SubActionType.ENABLED_STATUS: ButtonText.DEACTIVATED
-                if item.enabled
-                else ButtonText.ACTIVATED,
+                SubActionType.ENABLED_STATUS: ButtonText.DEACTIVATED if item.enabled else ButtonText.ACTIVATED,
                 SubActionType.CHANGE_CONFIG: ButtonText.CHANGE_CONFIG,
                 SubActionType.REMOVE: ButtonText.REMOVE,
             },
@@ -193,3 +187,32 @@ class BotKB:
         kb.adjust(2)
         kb.row(cls._back(section=section, target=target), size=1)
         return kb.as_markup()
+
+    @classmethod
+    def subs_menu(cls, pagination: Pagination) -> InlineKeyboardMarkup:
+        return cls._menu(
+            items={item.kb_remark: item.id for item in pagination.items},
+            section=SectionType.SUBS,
+            pagination=pagination,
+        )
+
+    @classmethod
+    def subs_update(cls, item: Subscription) -> InlineKeyboardMarkup:
+        return cls._update(
+            section=SectionType.SUBS,
+            target=item.id,
+            updates={
+                SubActionType.REMARK: ButtonText.REMARK,
+                SubActionType.ENABLED_STATUS: ButtonText.DEACTIVATED if item.enabled else ButtonText.ACTIVATED,
+                SubActionType.EXPIRE: ButtonText.EXPIRE,
+                SubActionType.USAGE_LIMIT: ButtonText.USAGE_LIMIT,
+                SubActionType.RESET_USAGE: ButtonText.RESET_USAGE,
+                SubActionType.REVOKE: ButtonText.REVOKE,
+                SubActionType.QRCODE: ButtonText.QRCODE,
+                SubActionType.REMOVE: ButtonText.REMOVE,
+            },
+        )
+
+    @classmethod
+    def subs_back(cls, target: Optional[int | str] = None) -> InlineKeyboardMarkup:
+        return cls._back_generate(section=SectionType.SUBS, target=target)

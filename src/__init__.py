@@ -16,10 +16,6 @@ logging.basicConfig(
 )
 
 for handler in logging.root.handlers:
-    handler.setFormatter(
-        CustomFormatter(
-            fmt="[{asctime}] {levelname} {message}", datefmt="%m/%d %H:%M:%S", style="{"
-        )
-    )
+    handler.setFormatter(CustomFormatter(fmt="[{asctime}] {levelname} {message}", datefmt="%m/%d %H:%M:%S", style="{"))
 
 logging.getLogger("httpx").propagate = False

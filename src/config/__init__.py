@@ -4,6 +4,7 @@ from .env import (
     TELEGRAM_ADMINS_ID,
     TELEGRAM_API_TOKEN,
     TELEGRAM_LOGGER_GROUP_ID,
+    SUBSCRIPTION_DOMAIN_PREFIX,
 )
 from .tg import BOT, DP
 
@@ -15,4 +16,5 @@ __all__ = [
     "TELEGRAM_LOGGER_GROUP_ID",
     "BOT",
     "DP",
+    "SUBSCRIPTION_DOMAIN_PREFIX",
 ]

@@ -23,9 +23,7 @@ async def server_info_handler(
     await state.clear_state(db=db)
     server = await Server.get_by_id(db, int(callback_data.target))
     if not server:
-        return await callback_query.answer(
-            DialogText.SERVERS_NOT_FOUND, show_alert=True
-        )
+        return await callback_query.answer(DialogText.SERVERS_NOT_FOUND, show_alert=True)
     update = await callback_query.message.edit(
         text=DialogText.SERVERS_INFO.format(**server.format()),
         reply_markup=BotKB.servers_update(server),

@@ -1,3 +1,6 @@
+[tool.ruff]
+line-length = 128
+
 [project]
 name = "liteguard"
 version = "0.1.0"

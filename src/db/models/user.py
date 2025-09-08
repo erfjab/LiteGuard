@@ -41,9 +41,7 @@ class UserMessage(Base):
             db.add(UserMessage(user_id=message.chat.id, message_id=message.message_id))
 
     @classmethod
-    async def clear(
-        cls, update: Union[Message, CallbackQuery], *, keep_current: bool = False
-    ) -> None:
+    async def clear(cls, update: Union[Message, CallbackQuery], *, keep_current: bool = False) -> None:
         async with GetDB() as db:
             user_id = await cls._get_user_id(update)
             message_id = getattr(
@@ -54,9 +52,7 @@ class UserMessage(Base):
             delete_condition = UserMessage.user_id == user_id
             if keep_current and message_id:
                 delete_condition &= UserMessage.message_id != message_id
-            messages = await db.execute(
-                select(UserMessage.message_id).where(delete_condition)
-            )
+            messages = await db.execute(select(UserMessage.message_id).where(delete_condition))
             message_ids = [msg[0] for msg in messages.all()]
             if message_ids:
                 try:
@@ -119,35 +115,24 @@ class User(Base):
         return result.scalars().first()
 
     @classmethod
-    async def get_by_fullname(
-        cls, db: AsyncSession, full_name: str
-    ) -> Optional["User"]:
+    async def get_by_fullname(cls, db: AsyncSession, full_name: str) -> Optional["User"]:
         result = await db.execute(select(cls).where(cls.full_name == full_name))
         return result.scalars().first()
 
     @classmethod
-    async def get_paginated(
-        cls, db: AsyncSession, page: int, limit: int = 20
-    ) -> Pagination:
+    async def get_paginated(cls, db: AsyncSession, page: int, limit: int = 20) -> Pagination:
         total_result = await db.execute(select(func.count()).select_from(cls))  # noqa
         total_items = total_result.scalar() or 0
         total_pages = (total_items + limit - 1) // limit if total_items > 0 else 0
         if total_pages == 0:
             return Pagination(items=[], total=0, current=1, back=None, next=None)
         current = max(1, min(page, total_pages))
-        query = (
-            select(cls)
-            .order_by(cls.join_at.desc())
-            .offset((current - 1) * limit)
-            .limit(limit)
-        )
+        query = select(cls).order_by(cls.join_at.desc()).offset((current - 1) * limit).limit(limit)
         result = await db.execute(query)
         items = result.scalars().all()
         back = current - 1 if current > 1 else None
         next = current + 1 if current < total_pages else None
-        return Pagination(
-            items=items, total=total_pages, current=current, back=back, next=next
-        )
+        return Pagination(items=items, total=total_pages, current=current, back=back, next=next)
 
     @classmethod
     async def upsert(cls, db: AsyncSession, *, user: EioUser) -> Optional["User"]:

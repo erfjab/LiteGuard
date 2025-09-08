@@ -19,37 +19,25 @@ class ServerCreateForm(StateGroup):
 @router.callback_query(
     BotCB.filter(section=SectionType.SERVERS, action=ActionType.CREATE),
 )
-async def server_create_handler(
-    callback_query: CallbackQuery, db: AsyncSession, state: StateManager
-):
+async def server_create_handler(callback_query: CallbackQuery, db: AsyncSession, state: StateManager):
     await state.set_state(db=db, state=ServerCreateForm.remark)
-    return await callback_query.message.edit(
-        text=DialogText.SERVERS_ENTER_REMARK, reply_markup=BotKB.servers_back()
-    )
+    return await callback_query.message.edit(text=DialogText.SERVERS_ENTER_REMARK, reply_markup=BotKB.servers_back())
 
 
 @router.message(StateFilter(ServerCreateForm.remark), Text())
-async def server_remark_handler(
-    message: Message, db: AsyncSession, state: StateManager
-):
+async def server_remark_handler(message: Message, db: AsyncSession, state: StateManager):
     if await Server.get_by_remark(db, message.text):
         update = await message.answer(
             text=DialogText.SERVERS_REMARK_EXISTS,
         )
         return await UserMessage.add(update)
-    await state.upsert_context(
-        db=db, state=ServerCreateForm.config, remark=message.text
-    )
-    update = await message.answer(
-        text=DialogText.SERVERS_ENTER_CONFIG, reply_markup=BotKB.servers_back()
-    )
+    await state.upsert_context(db=db, state=ServerCreateForm.config, remark=message.text)
+    update = await message.answer(text=DialogText.SERVERS_ENTER_CONFIG, reply_markup=BotKB.servers_back())
     return await UserMessage.clear(update)
 
 
 @router.message(StateFilter(ServerCreateForm.config), Text())
-async def server_config_handler(
-    message: Message, db: AsyncSession, state: StateManager, state_data: dict
-):
+async def server_config_handler(message: Message, db: AsyncSession, state: StateManager, state_data: dict):
     messages = message.text.split()
     if len(messages) != 3:
         update = await message.answer(
@@ -57,9 +45,7 @@ async def server_config_handler(
         )
         return await UserMessage.add(update)
 
-    access = await XUIRequest.login(
-        host=messages[2], username=messages[0], password=messages[1]
-    )
+    access = await XUIRequest.login(host=messages[2], username=messages[0], password=messages[1])
     if not access:
         update = await message.answer(
             text=DialogText.SERVERS_INVALID_ACCESS,
@@ -73,7 +59,5 @@ async def server_config_handler(
     )
     await Server.upsert_access(db, server_id=server.id, access=dict(access.cookies))
     await state.clear_state(db=db)
-    update = await message.answer(
-        text=DialogText.ACTIONS_SUCCESS, reply_markup=BotKB.servers_back(server.id)
-    )
+    update = await message.answer(text=DialogText.ACTIONS_SUCCESS, reply_markup=BotKB.servers_back(server.id))
     return await UserMessage.clear(update)

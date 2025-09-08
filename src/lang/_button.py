@@ -29,3 +29,8 @@ class ButtonText(StrEnum):
     ACTIVATED = "✔️ Activated"
     DEACTIVATED = "✖️ Deactivated"
     REMOVE = "🗑️ Remove"
+    EXPIRE = "🕒 Expire"
+    USAGE_LIMIT = "📊 Usage Limit"
+    RESET_USAGE = "🔄 Reset Usage"
+    REVOKE = "🚫 Revoke"
+    QRCODE = "🆔 QR Code"
