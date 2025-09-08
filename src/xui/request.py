@@ -1,0 +1,204 @@
+import json
+import logging
+from typing import Optional, Dict, List
+from httpx import AsyncClient, Response
+from .types import Inbound, ClientRequest
+
+
+class XUIRequest:
+    @classmethod
+    def _get_headers(cls) -> Dict[str, str]:
+        return {
+            "Content-Type": "application/json",
+        }
+
+    @classmethod
+    async def _send(
+        cls,
+        url: str,
+        method: str = "GET",
+        params: Optional[dict] = None,
+        json: Optional[dict] = None,
+        cookies: Optional[dict] = None,
+    ) -> Dict[str, str]:
+        try:
+            async with AsyncClient(cookies=cookies) as client:
+                response = await client.request(
+                    method=method,
+                    url=url,
+                    headers=cls._get_headers(),
+                    json=json,
+                    params=params,
+                )
+            response.raise_for_status()
+            return response.json()
+        except Exception as e:
+            logging.error(f"Request to {url} failed: {e}")
+            return {"success": False, "msg": str(e), "obj": None}
+
+    @classmethod
+    async def login(cls, host: str, username: str, password: str) -> Optional[Response]:
+        try:
+            async with AsyncClient() as client:
+                response = await client.request(
+                    method="POST",
+                    url=f"{host}/login",
+                    headers=cls._get_headers(),
+                    json={"username": username, "password": password},
+                )
+                if response.status_code != 200:
+                    return
+                return response
+        except Exception as e:
+            logging.error(f"Login failed: {e}")
+            return
+
+    @classmethod
+    async def get_inbounds(cls, host: str, cookies: dict) -> Optional[List[Inbound]]:
+        inbounds = await cls._send(
+            url=f"{host}/panel/api/inbounds/list", method="GET", cookies=cookies
+        )
+        return (
+            [Inbound(**item) for item in inbounds["obj"]]
+            if inbounds["success"]
+            else None
+        )
+
+    @classmethod
+    async def create_client(
+        cls,
+        host: str,
+        cookies: dict,
+        inbound_id: int,
+        clients: List[ClientRequest],
+    ) -> Dict[str, str]:
+        print(client.id for client in clients)
+        return await cls._send(
+            url=f"{host}/panel/api/inbounds/addClient",
+            method="POST",
+            cookies=cookies,
+            json={
+                "id": inbound_id,
+                "settings": json.dumps(
+                    {
+                        "clients": [
+                            {
+                                "id": client.id,
+                                "email": client.id,
+                                "subId": client.id,
+                                "expiryTime": 0,
+                                "totalGB": 0,
+                                "enable": True,
+                            }
+                            for client in clients
+                        ]
+                    }
+                ),
+            },
+        )
+
+    @classmethod
+    async def deactivate_client(
+        cls, host: str, cookies: dict, inbound_id: int, client_id: str
+    ) -> Dict[str, str]:
+        return await cls._send(
+            url=f"{host}/panel/api/inbounds/updateClient/{client_id}",
+            method="POST",
+            cookies=cookies,
+            json={
+                "id": inbound_id,
+                "settings": json.dumps(
+                    {
+                        "clients": [
+                            {
+                                "id": client_id,
+                                "email": client_id,
+                                "subId": client_id,
+                                "expiryTime": 0,
+                                "totalGB": 0,
+                                "enable": False,
+                            }
+                        ]
+                    }
+                ),
+            },
+        )
+
+    @classmethod
+    async def activate_client(
+        cls, host: str, cookies: dict, inbound_id: int, client_id: str
+    ) -> Dict[str, str]:
+        return await cls._send(
+            url=f"{host}/panel/api/inbounds/updateClient/{client_id}",
+            method="POST",
+            cookies=cookies,
+            json={
+                "id": inbound_id,
+                "settings": json.dumps(
+                    {
+                        "clients": [
+                            {
+                                "id": client_id,
+                                "email": client_id,
+                                "subId": client_id,
+                                "expiryTime": 0,
+                                "totalGB": 0,
+                                "enable": True,
+                            }
+                        ]
+                    }
+                ),
+            },
+        )
+
+    @classmethod
+    async def revoke_client(
+        cls,
+        host: str,
+        cookies: dict,
+        inbound_id: int,
+        client_id: str,
+        client: ClientRequest,
+    ) -> Dict[str, str]:
+        return await cls._send(
+            url=f"{host}/panel/api/inbounds/updateClient/{client_id}",
+            method="POST",
+            cookies=cookies,
+            json={
+                "id": inbound_id,
+                "settings": json.dumps(
+                    {
+                        "clients": [
+                            {
+                                "id": client.id,
+                                "email": client.id,
+                                "subId": client.id,
+                                "enable": client.enable,
+                                "expiryTime": 0,
+                                "totalGB": 0,
+                            }
+                        ]
+                    }
+                ),
+            },
+        )
+
+    @classmethod
+    async def remove_client(
+        cls, host: str, cookies: dict, inbound_id: int, client_id: str
+    ) -> Dict[str, str]:
+        return await cls._send(
+            url=f"{host}/panel/api/inbounds/{inbound_id}/delClient/{client_id}",
+            method="POST",
+            cookies=cookies,
+        )
+
+    @classmethod
+    async def reset_client(
+        cls, host: str, cookies: dict, inbound_id: int, client_id: str
+    ) -> Dict[str, str]:
+        return await cls._send(
+            url=f"{host}/panel/api/inbounds/{inbound_id}/resetClientTraffic/{client_id}",
+            method="POST",
+            cookies=cookies,
+        )
