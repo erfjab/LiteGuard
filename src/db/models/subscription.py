@@ -323,6 +323,7 @@ class Subscription(Base):
         remark: Optional[str] = None,
         expire: Optional[int] = None,
         limit_usage: Optional[int] = None,
+        server_key: Optional[str] = None,
         enabled: Optional[bool] = None,
         activated: Optional[bool] = None,
         removed: Optional[bool] = None,
@@ -339,6 +340,8 @@ class Subscription(Base):
             sub.activated = activated
         if removed is not None:
             sub.removed = removed
+        if server_key is not None:
+            sub.server_key = server_key
 
         await db.flush()
         return sub

@@ -158,7 +158,7 @@ class XUIRequest:
         client: ClientRequest,
     ) -> bool:
         result = await cls._send(
-            url=f"{host}/panel/api/inbounds/updateClient/{inbound_id}{client_id}",
+            url=f"{host}/panel/api/inbounds/updateClient/{inbound_id}{client.id}",
             method="POST",
             cookies=cookies,
             json={

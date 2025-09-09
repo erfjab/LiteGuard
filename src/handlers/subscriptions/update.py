@@ -111,7 +111,7 @@ async def approval_handler(
 ):
     await callback_query.message.edit(text=DialogText.ACTIONS_PROCESSING)
     await state.clear_state(db=db)
-    sub = await Subscription.get_by_id(db, int(state_data["server_id"]))
+    sub = await Subscription.get_by_id(db, int(state_data["sub_id"]))
     if not sub:
         update = await callback_query.message.answer(DialogText.SERVERS_NOT_FOUND, reply_markup=BotKB.subs_back())
         return await UserMessage.clear(update)
