@@ -2,6 +2,7 @@ from eiogram import Router
 from .middlewares import Middleware
 from . import commands, fallback  # noqa
 from .servers import setup_server_handlers
+from .subscriptions import setup_subscription_handlers
 
 
 def setup_handlers() -> Router:
@@ -9,6 +10,7 @@ def setup_handlers() -> Router:
     router.middleware.register(Middleware())
     router.include_router(commands.router)
     setup_server_handlers(router=router)
+    setup_subscription_handlers(router=router)
     return router
 
 

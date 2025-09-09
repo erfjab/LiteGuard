@@ -25,6 +25,6 @@ async def sub_menu_handler(
     pagination = await Subscription.get_paginated(db, page=int(callback_data.page) if callback_data.page else 1)
     update = await callback_query.message.edit(
         text=DialogText.SUBS_MENU,
-        reply_markup=BotKB.subscriptions_menu(pagination=pagination),
+        reply_markup=BotKB.subs_menu(pagination=pagination),
     )
     return await UserMessage.clear(update, keep_current=True)

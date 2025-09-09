@@ -22,6 +22,12 @@ class SubCreateForm(StateGroup):
     BotCB.filter(section=SectionType.SUBS, action=ActionType.CREATE),
 )
 async def sub_create_handler(callback_query: CallbackQuery, db: AsyncSession, state: StateManager):
+    servers = await Server.get_all(db)
+    if not servers:
+        return await callback_query.answer(
+            text=DialogText.SUBS_NO_SERVERS,
+            show_alert=True,
+        )
     await state.set_state(db=db, state=SubCreateForm.remark)
     return await callback_query.message.edit(text=DialogText.SUBS_ENTER_REMARK, reply_markup=BotKB.subs_back())
 
@@ -65,7 +71,7 @@ async def sub_expire_handler(message: Message, db: AsyncSession, state: StateMan
 async def sub_expire_type_handler(callback_query: CallbackQuery, callback_data: BotCB, db: AsyncSession, state: StateManager):
     await state.upsert_context(
         db=db,
-        state=SubCreateForm.expire_type,
+        state=SubCreateForm.limit_usage,
         after_first_use=callback_data.approval,
     )
     return await callback_query.message.edit(
@@ -81,9 +87,17 @@ async def sub_limit_usage_handler(message: Message, db: AsyncSession, state: Sta
             text=DialogText.SUBS_INVALID_LIMIT_USAGE,
         )
         return await UserMessage.add(update)
-    client_uuid = Subscription.generate_key()
+    servers = await Server.get_all(db)
+    if not servers:
+        update = await message.answer(
+            text=DialogText.SUBS_NO_SERVERS,
+            reply_markup=BotKB.servers_back(),
+        )
+        return await UserMessage.add(update)
+
+    client_uuid = Subscription.generate_server_key()
     client_created = await XUIManager.create(
-        servers=await Server.get_all(db),
+        servers=servers,
         uuid=client_uuid,
     )
     if not client_created:
@@ -91,15 +105,17 @@ async def sub_limit_usage_handler(message: Message, db: AsyncSession, state: Sta
             text=DialogText.SUBS_XUI_CLIENT_CREATE_FAILED,
         )
         return await UserMessage.add(update)
+
     sub = await Subscription.create(
         db,
         remark=state_data["remark"],
-        access_key=Subscription.generate_key(),
+        access_key=Subscription.generate_access_key(),
         server_key=client_uuid,
         expire=Subscription.generate_expire(int(state_data["expire"]), state_data["after_first_use"]),
         limit_usage=int(message.text) * 1024 * 1024 * 1024,
         owner=message.from_user.id,
     )
+
     update = await message.answer(
         text=DialogText.ACTIONS_SUCCESS,
         reply_markup=BotKB.subs_back(sub.id),

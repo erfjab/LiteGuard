@@ -31,6 +31,8 @@ class XUIRequest:
                     params=params,
                 )
             response.raise_for_status()
+            if not response.json().get("success"):
+                logging.error(f"Request to {url} failed [{json}]: {response.json().get('msg', 'Unknown error')}")
             return response.json()
         except Exception as e:
             logging.error(f"Request to {url} failed: {e}")
@@ -76,8 +78,9 @@ class XUIRequest:
                     {
                         "clients": [
                             {
-                                "id": client.id,
-                                "email": client.id,
+                                "id": f"{inbound_id}{client.id}",
+                                "email": f"{inbound_id}{client.id}",
+                                "password": f"{inbound_id}{client.id}",
                                 "subId": client.id,
                                 "expiryTime": 0,
                                 "totalGB": 0,
@@ -94,7 +97,7 @@ class XUIRequest:
     @classmethod
     async def deactivate_client(cls, host: str, cookies: dict, inbound_id: int, client_id: str) -> bool:
         result = await cls._send(
-            url=f"{host}/panel/api/inbounds/updateClient/{client_id}",
+            url=f"{host}/panel/api/inbounds/updateClient/{inbound_id}{client_id}",
             method="POST",
             cookies=cookies,
             json={
@@ -103,8 +106,9 @@ class XUIRequest:
                     {
                         "clients": [
                             {
-                                "id": client_id,
-                                "email": client_id,
+                                "id": f"{inbound_id}{client_id}",
+                                "email": f"{inbound_id}{client_id}",
+                                "password": f"{inbound_id}{client_id}",
                                 "subId": client_id,
                                 "expiryTime": 0,
                                 "totalGB": 0,
@@ -120,7 +124,7 @@ class XUIRequest:
     @classmethod
     async def activate_client(cls, host: str, cookies: dict, inbound_id: int, client_id: str) -> bool:
         result = await cls._send(
-            url=f"{host}/panel/api/inbounds/updateClient/{client_id}",
+            url=f"{host}/panel/api/inbounds/updateClient/{inbound_id}{client_id}",
             method="POST",
             cookies=cookies,
             json={
@@ -129,8 +133,9 @@ class XUIRequest:
                     {
                         "clients": [
                             {
-                                "id": client_id,
-                                "email": client_id,
+                                "id": f"{inbound_id}{client_id}",
+                                "email": f"{inbound_id}{client_id}",
+                                "password": f"{inbound_id}{client_id}",
                                 "subId": client_id,
                                 "expiryTime": 0,
                                 "totalGB": 0,
@@ -153,7 +158,7 @@ class XUIRequest:
         client: ClientRequest,
     ) -> bool:
         result = await cls._send(
-            url=f"{host}/panel/api/inbounds/updateClient/{client_id}",
+            url=f"{host}/panel/api/inbounds/updateClient/{inbound_id}{client_id}",
             method="POST",
             cookies=cookies,
             json={
@@ -162,9 +167,10 @@ class XUIRequest:
                     {
                         "clients": [
                             {
-                                "id": client.id,
-                                "email": client.id,
-                                "subId": client.id,
+                                "id": f"{inbound_id}{client_id}",
+                                "email": f"{inbound_id}{client_id}",
+                                "password": f"{inbound_id}{client_id}",
+                                "subId": client_id,
                                 "enable": client.enable,
                                 "expiryTime": 0,
                                 "totalGB": 0,
@@ -179,7 +185,7 @@ class XUIRequest:
     @classmethod
     async def remove_client(cls, host: str, cookies: dict, inbound_id: int, client_id: str) -> bool:
         result = await cls._send(
-            url=f"{host}/panel/api/inbounds/{inbound_id}/delClient/{client_id}",
+            url=f"{host}/panel/api/inbounds/{inbound_id}/delClient/{inbound_id}{client_id}",
             method="POST",
             cookies=cookies,
         )
@@ -188,7 +194,7 @@ class XUIRequest:
     @classmethod
     async def reset_client(cls, host: str, cookies: dict, inbound_id: int, client_id: str) -> bool:
         result = await cls._send(
-            url=f"{host}/panel/api/inbounds/{inbound_id}/resetClientTraffic/{client_id}",
+            url=f"{host}/panel/api/inbounds/{inbound_id}/resetClientTraffic/{inbound_id}{client_id}",
             method="POST",
             cookies=cookies,
         )

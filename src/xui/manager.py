@@ -18,14 +18,16 @@ class XUIManager:
                 continue
             total += len(inbounds)
             for inbound in inbounds:
-                for client in inbound.clientStats:
-                    if client.id == uuid:
-                        continue
+                exists = any(c.id == uuid for c in inbound.clientStats)
+                if exists:
+                    success += 1
+                    continue
+
                 client = await XUIRequest.create_client(
                     host=server.host,
                     cookies=server.cookies,
                     inbound_id=inbound.id,
-                    clients=ClientRequest(id=uuid),
+                    clients=[ClientRequest(id=uuid)],
                 )
                 if client:
                     success += 1
@@ -41,9 +43,11 @@ class XUIManager:
                 continue
             total += len(inbounds)
             for inbound in inbounds:
-                for client in inbound.clientStats:
-                    if client.id == uuid and not client.enable:
-                        continue
+                target = next((c for c in inbound.clientStats if c.id == uuid), None)
+                if target is not None and not target.enable:
+                    success += 1
+                    continue
+
                 client = await XUIRequest.deactivate_client(
                     host=server.host,
                     cookies=server.cookies,
@@ -64,9 +68,11 @@ class XUIManager:
                 continue
             total += len(inbounds)
             for inbound in inbounds:
-                for client in inbound.clientStats:
-                    if client.id == uuid and client.enable:
-                        continue
+                target = next((c for c in inbound.clientStats if c.id == uuid), None)
+                if target is not None and target.enable:
+                    success += 1
+                    continue
+
                 client = await XUIRequest.activate_client(
                     host=server.host,
                     cookies=server.cookies,
@@ -98,7 +104,7 @@ class XUIManager:
         return success == total
 
     @classmethod
-    async def revoke(cls, servers: list[Server], uuid: str, new_uuid: str, enable: bool) -> None:
+    async def revoke(cls, servers: list[Server], uuid: str, new_uuid: str, enable: bool) -> bool:
         total = 0
         success = 0
         for server in servers:

@@ -9,6 +9,7 @@ class DialogText(StrEnum):
     ACTIONS_SUCCESS = "✅ Action completed successfully."
     ACTIONS_APPROVAL = "⚠️ <b>Are you sure you want to proceed with this action?</b>"
     ACTIONS_FORGET = "❌ Action cancelled. No changes were made."
+    ACTIONS_PROCESSING = "⏳ Processing your request. Please wait..."
 
     ### Servers
     SERVERS_MENU = "🖥 <b>Server Management</b>\nSelect a server to manage or add a new one."
@@ -49,7 +50,7 @@ class DialogText(StrEnum):
         "<b>Expire:</b> <code>{expire}</code>\n"
         "➖➖➖➖➖\n"
         "<b>OnlineAt:</b> <code>{online_at}</code>\n"
-        "<b>SubUpdate:</b> <code>{sub_updated_at}</code>\n"
+        "<b>SubUpdate:</b> <code>{last_sub_updated_at}</code>\n"
         "<b>CreatedAt:</b> <code>{created_at}</code>\n"
         "<b>UpdatedAt:</b> <code>{updated_at}</code>\n"
         "➖➖➖➖➖\n"
@@ -67,4 +68,19 @@ class DialogText(StrEnum):
     SUBS_INVALID_LIMIT_USAGE = "❌ Invalid usage limit. Please send a valid number (e.g., 10 for 10 GB)."
     SUBS_XUI_CLIENT_CREATE_FAILED = (
         "❌ Failed to create client on XUI server. Please check the server configuration and try again."
+    )
+    SUBS_NO_SERVERS = "❌ No servers available. Please add a server first."
+    SUBS_QRCODE = (
+        "📱 <b>Subscription QR Code</b>\n"
+        "Scan the QR code below to access your subscription:\n"
+        "<b>Remark:</b> <code>{remark} </code> [<code>{id}</code>]\n"
+        "<b>UsageLimit:</b> <code>{limit_usage}</code>\n"
+        "<b>Expire:</b> <code>{expire}</code>\n"
+        "<b>Link:</b> {link}\n"
+    )
+    SUBS_XUI_CLIENT_UPDATE_FAILED = (
+        "❌ Failed to update client on XUI server. Please check the server configuration and try again."
+    )
+    SUBS_XUI_CLIENT_DELETE_FAILED = (
+        "❌ Failed to delete client on XUI server. Please check the server configuration and try again."
     )

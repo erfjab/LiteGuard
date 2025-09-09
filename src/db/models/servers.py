@@ -66,9 +66,11 @@ class Server(Base):
 
     @property
     def need_update_access(self) -> bool:
-        if not self.cookies:
+        if not self.server_access:
             return True
-        return self.server_access.updated_at > timedelta(hours=8)
+        if not self.server_access.updated_at:
+            return True
+        return (datetime.now() - self.server_access.updated_at) > timedelta(hours=8)
 
     @property
     def host(self) -> Optional[str]:

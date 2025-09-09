@@ -1,6 +1,5 @@
 from datetime import datetime, timedelta
 from typing import Optional, Dict, TYPE_CHECKING, List
-
 from sqlalchemy import (
     String,
     DateTime,
@@ -31,8 +30,8 @@ class SubscriptionUsage(Base):
 
     sub_id: Mapped[int] = mapped_column(Integer, ForeignKey("subscriptions.id"), nullable=False, index=True)
     server_id: Mapped[int] = mapped_column(Integer, ForeignKey("servers.id"), nullable=False, index=True)
-    inbound_id: Mapped[int] = mapped_column(Integer, ForeignKey("inbounds.id"), nullable=True, index=True)
-    client_id: Mapped[int] = mapped_column(Integer, ForeignKey("clients.id"), nullable=True, index=True)
+    inbound_id: Mapped[int] = mapped_column(Integer, nullable=True, index=True)
+    client_id: Mapped[int] = mapped_column(Integer, nullable=True, index=True)
 
     usage: Mapped[BigInteger] = mapped_column(BigInteger, default=0, nullable=False)
 
@@ -50,7 +49,7 @@ class Subscription(Base):
     removed: Mapped[bool] = mapped_column(Boolean, default=False, nullable=True)
 
     remark: Mapped[str] = mapped_column(String(256), nullable=False, index=True)
-    server_key: Mapped[str] = mapped_column(String(16), nullable=False, index=True)
+    server_key: Mapped[str] = mapped_column(String(64), nullable=False, index=True)
     access_key: Mapped[str] = mapped_column(String(16), nullable=False, index=True)
 
     owner: Mapped[Optional[int]] = mapped_column(BigInteger, ForeignKey("users.id"), nullable=True, index=True)
@@ -63,7 +62,7 @@ class Subscription(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False)
     updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime, onupdate=datetime.now, nullable=True)
 
-    user: Mapped[Optional["User"]] = relationship("User", back_populates="subscriptions", lazy="selectin")
+    user: Mapped[Optional["User"]] = relationship("User", back_populates=None, lazy="selectin")
     usages: Mapped[List["SubscriptionUsage"]] = relationship("SubscriptionUsage", uselist=True, lazy="selectin")
 
     @hybrid_property
@@ -227,7 +226,13 @@ class Subscription(Base):
         }
 
     @classmethod
-    def generate_key(cls) -> str:
+    def generate_server_key(cls) -> str:
+        from uuid import uuid4
+
+        return str(uuid4())
+
+    @classmethod
+    def generate_access_key(cls) -> str:
         from secrets import token_hex
 
         return str(token_hex(8))

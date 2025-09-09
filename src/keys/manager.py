@@ -126,12 +126,12 @@ class BotKB:
         kb = InlineKeyboardBuilder()
         items = {
             SectionType.STATS: ButtonText.STATS,
-            SectionType.USERS: ButtonText.USERS,
+            # SectionType.USERS: ButtonText.USERS,
             SectionType.SUBS: ButtonText.SUBS,
             SectionType.TEST: ButtonText.TEST,
-            SectionType.API_KEYS: ButtonText.API_KEYS,
+            # SectionType.API_KEYS: ButtonText.API_KEYS,
             SectionType.SERVERS: ButtonText.SERVERS,
-            SectionType.SETTING: ButtonText.SETTING,
+            # SectionType.SETTING: ButtonText.SETTING,
         }
         for section, remark in items.items():
             kb.add(
@@ -177,11 +177,11 @@ class BotKB:
     ):
         kb = InlineKeyboardBuilder()
         kb.add(
-            text=ButtonText.ACTIONS_CONFIRM,
+            text=ButtonText.ACTIONS_YES,
             callback_data=BotCB(section=section, action=action, approval=True).pack(),
         )
         kb.add(
-            text=ButtonText.ACTIONS_CANCEL,
+            text=ButtonText.ACTIONS_NO,
             callback_data=BotCB(section=section, action=action, approval=False).pack(),
         )
         kb.adjust(2)
