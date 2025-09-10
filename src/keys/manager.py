@@ -1,7 +1,7 @@
 from typing import List, Optional, Dict
 from eiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from eiogram.utils import InlineKeyboardBuilder
-from src.db import Server, Subscription
+from src.db import Server, Subscription, Setting
 from src.utils.pagination import Pagination
 from src.lang import ButtonText
 from .callbacks import BotCB
@@ -126,12 +126,9 @@ class BotKB:
         kb = InlineKeyboardBuilder()
         items = {
             SectionType.STATS: ButtonText.STATS,
-            # SectionType.USERS: ButtonText.USERS,
             SectionType.SUBS: ButtonText.SUBS,
-            SectionType.TEST: ButtonText.TEST,
-            # SectionType.API_KEYS: ButtonText.API_KEYS,
             SectionType.SERVERS: ButtonText.SERVERS,
-            # SectionType.SETTING: ButtonText.SETTING,
+            SectionType.SETTINGS: ButtonText.SETTING,
         }
         for section, remark in items.items():
             kb.add(
@@ -216,3 +213,62 @@ class BotKB:
     @classmethod
     def subs_back(cls, target: Optional[int | str] = None) -> InlineKeyboardMarkup:
         return cls._back_generate(section=SectionType.SUBS, target=target)
+
+    @classmethod
+    def settings_back(cls) -> InlineKeyboardMarkup:
+        return cls._back_generate(section=SectionType.SETTINGS)
+
+    @classmethod
+    def settings_menu(cls, setting: Setting) -> InlineKeyboardMarkup:
+        kb = InlineKeyboardBuilder()
+        updates = {
+            SubActionType.SHUFFLE: ButtonText.DISABLED_SHUFFLE if setting.shuffle else ButtonText.ACTIVATED_SHUFFLE,
+            SubActionType.CREATE_PLACEHOLDER: ButtonText.CREATE_PLACEHOLDER,
+            SubActionType.REMOVE_PLACEHOLDER: ButtonText.REMOVE_PLACEHOLDER,
+            SubActionType.CREATE_INFORMATION: ButtonText.CREATE_INFORMATION,
+            SubActionType.REMOVE_INFORMATION: ButtonText.REMOVE_INFORMATION,
+        }
+        for sub_action, text in updates.items():
+            kb.add(
+                text=text,
+                callback_data=BotCB(
+                    section=SectionType.SETTINGS,
+                    action=ActionType.UPDATE,
+                    sub_action=sub_action,
+                ).pack(),
+            )
+        kb.adjust(1, 2, 2)
+        kb.row(cls._back(), size=1)
+        return kb.as_markup()
+
+    @classmethod
+    def remove_placeholder(cls, setting: Setting) -> InlineKeyboardMarkup:
+        kb = InlineKeyboardBuilder()
+        for idx, remark in enumerate(setting.placeholders):
+            kb.add(
+                text=remark,
+                callback_data=BotCB(
+                    section=SectionType.SETTINGS,
+                    action=ActionType.UPDATE,
+                    target=idx,
+                ).pack(),
+            )
+        kb.adjust(1)
+        kb.row(cls._back(section=SectionType.SETTINGS), size=1)
+        return kb.as_markup()
+
+    @classmethod
+    def remove_information(cls, setting: Setting) -> InlineKeyboardMarkup:
+        kb = InlineKeyboardBuilder()
+        for idx, remark in enumerate(setting.informations):
+            kb.add(
+                text=remark,
+                callback_data=BotCB(
+                    section=SectionType.SETTINGS,
+                    action=ActionType.UPDATE,
+                    target=idx,
+                ).pack(),
+            )
+        kb.adjust(1)
+        kb.row(cls._back(section=SectionType.SETTINGS), size=1)
+        return kb.as_markup()

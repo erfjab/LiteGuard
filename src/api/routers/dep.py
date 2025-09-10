@@ -1,12 +1,26 @@
 from typing import Annotated
 from fastapi import Depends, HTTPException
 
-from src.db import GetDB, AsyncSession, Subscription
+from src.db import GetDB, AsyncSession, Subscription, Server, Setting
 
 
 async def _get_db():
     async with GetDB() as db:
         yield db
+
+
+async def get_servers(db: AsyncSession = Depends(_get_db)):
+    servers = await Server.get_all(db)
+    if not servers:
+        raise HTTPException(status_code=404, detail="Hosting not found")
+    return servers
+
+
+async def get_settings(db: AsyncSession = Depends(_get_db)):
+    setting = await Setting.get(db)
+    if not setting:
+        raise HTTPException(status_code=404, detail="Configuration not found")
+    return setting
 
 
 async def _get_guard(key: str, db: AsyncSession = Depends(_get_db)) -> Subscription:
@@ -36,3 +50,5 @@ def get_headers(sub: Subscription) -> dict:
 
 GetSession = Annotated[AsyncSession, Depends(_get_db)]
 GetGuard = Annotated[Subscription, Depends(_get_guard)]
+GetSetting = Annotated[Setting, Depends(get_settings)]
+GetServers = Annotated[list[Server], Depends(get_servers)]

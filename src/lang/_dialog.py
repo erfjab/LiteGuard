@@ -10,6 +10,7 @@ class DialogText(StrEnum):
     ACTIONS_APPROVAL = "⚠️ <b>Are you sure you want to proceed with this action?</b>"
     ACTIONS_FORGET = "❌ Action cancelled. No changes were made."
     ACTIONS_PROCESSING = "⏳ Processing your request. Please wait..."
+    ACTIONS_NOT_ALLOW = "❌ This action is not allowed."
 
     ### Servers
     SERVERS_MENU = "🖥 <b>Server Management</b>\nSelect a server to manage or add a new one."
@@ -84,3 +85,50 @@ class DialogText(StrEnum):
     SUBS_XUI_CLIENT_DELETE_FAILED = (
         "❌ Failed to delete client on XUI server. Please check the server configuration and try again."
     )
+
+    ### Settings
+    SETTINGS_MENU = (
+        "⚙️ <b>Settings Menu</b>\n"
+        "Configure your LiteGuard settings below.\n"
+        "➖➖➖➖➖\n"
+        "<b>Shuffle:</b> <code>{shuffle}</code>\n"
+        "<b>Placeholders:</b>{placeholders}\n"
+        "<b>Informations:</b>{informations}\n"
+    )
+    SETTINGS_ENTER_PLACEHOLDER = (
+        "📝 <b>Enter the placeholder text:</b>\n\n"
+        "This text will be displayed when a subscription is unavailable or disabled.\n\n"
+        "<b>Available variables:</b>\n"
+        "• <code>{ID}</code> - Subscription ID\n"
+        "• <code>{EMOJI}</code> - Subscription status emoji\n"
+        "• <code>{REMARK}</code> - Subscription remark/username\n"
+        "• <code>{LIMIT_USAGE}</code> - Usage limit (GB)\n"
+        "• <code>{CURRENT_USAGE}</code> - Current usage (GB)\n"
+        "• <code>{LIFETIME_USAGE}</code> - Total lifetime usage (GB)\n"
+        "• <code>{LEFT_USAGE}</code> - Remaining usage (GB)\n"
+        "• <code>{EXPIRE}</code> - Expiration date\n\n"
+        "<b>Examples:</b>\n"
+        "<code>⚠️ Subscription {REMARK} (ID: {ID}) is currently unavailable.</code>\n"
+        "<code>Usage: {CURRENT_USAGE}/{LIMIT_USAGE} GB | Expires: {EXPIRE}</code>"
+    )
+    SETTINGS_SELECT_PLACEHOLDER = "⚙️ <b>Select a placeholder text:</b>"
+    SETTINGS_SELECT_INFORMATION = "⚙️ <b>Select an information text:</b>"
+    SETTINGS_ENTER_INFORMATION = (
+        "📝 <b>Enter the information text:</b>\n\n"
+        "This text will be displayed at the top of the subscription.\n\n"
+        "<b>Available variables:</b>\n"
+        "• <code>{ID}</code> - Subscription ID\n"
+        "• <code>{EMOJI}</code> - Subscription status emoji\n"
+        "• <code>{REMARK}</code> - Subscription remark/username\n"
+        "• <code>{LIMIT_USAGE}</code> - Usage limit (GB)\n"
+        "• <code>{CURRENT_USAGE}</code> - Current usage (GB)\n"
+        "• <code>{LIFETIME_USAGE}</code> - Total lifetime usage (GB)\n"
+        "• <code>{LEFT_USAGE}</code> - Remaining usage (GB)\n"
+        "• <code>{EXPIRE}</code> - Expiration date\n"
+        "• <code>{AVAILABLED}</code> - Availability status\n"
+        "<b>Examples:</b>\n"
+        "<code>🌟 username: {REMARK}!\n</code>"
+        "<code>Enjoy your access with a limit of {LIMIT_USAGE} GB, valid until {EXPIRE}.</code>"
+    )
+    SETTINGS_NO_PLACEHOLDER = "❌ No placeholders available. Please add a placeholder first."
+    SETTINGS_NO_INFORMATION = "❌ No informations available. Please add an information first."

@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Optional, Dict, TYPE_CHECKING, List
+from xmlrpc.client import Server
 from sqlalchemy import (
     String,
     DateTime,
@@ -21,6 +22,7 @@ from ..core import Base
 
 if TYPE_CHECKING:
     from .user import User
+    from .servers import Server
 
 
 class SubscriptionUsage(Base):
@@ -37,6 +39,8 @@ class SubscriptionUsage(Base):
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False)
     updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime, default=datetime.now, onupdate=datetime.now, nullable=True)
+
+    server: Mapped["Server"] = relationship("Server", back_populates=None, lazy="selectin")
 
 
 class Subscription(Base):
@@ -205,6 +209,7 @@ class Subscription(Base):
         now = datetime.now()
         return {
             "id": self.id,
+            "emoji": self.emoji,
             "remark": self.remark,
             "access_key": self.access_key,
             "server_key": self.server_key,
@@ -223,6 +228,19 @@ class Subscription(Base):
             "last_sub_updated_at": time_diff(self.last_sub_updated_at, now),
             "online_at": time_diff(self.online_at, now),
             "server_usages": server_usage_str,
+        }
+
+    def config_format(self) -> Dict:
+        return {
+            "ID": self.id,
+            "EMOJI": self.emoji,
+            "REMARK": self.remark,
+            "AVAILABLED": self.availabled,
+            "EXPIRE": self.expire_day,
+            "LIMIT_USAGE": f"{round((self.limit_usage / (1024**3)), 3)} GB" if self.limit_usage else "➖",
+            "CURRENT_USAGE": f"{round((self.current_usage / (1024**3)), 3)} GB" if self.current_usage else "➖",
+            "LIFETIME_USAGE": f"{round((self.lifetime_usage / (1024**3)), 3)} GB" if self.lifetime_usage else "➖",
+            "LEFT_USAGE": self.left_usage_gb,
         }
 
     @classmethod

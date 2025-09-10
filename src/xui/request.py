@@ -14,6 +14,10 @@ class XUIRequest:
         }
 
     @classmethod
+    def generate_client_identifier(cls, inbound_id: int, client_id: str) -> str:
+        return str(inbound_id) + client_id[len(str(inbound_id)) :]
+
+    @classmethod
     async def _send(
         cls,
         url: str,
@@ -99,9 +103,9 @@ class XUIRequest:
                     {
                         "clients": [
                             {
-                                "id": f"{inbound_id}{client.id}",
-                                "email": f"{inbound_id}{client.id}",
-                                "password": f"{inbound_id}{client.id}",
+                                "id": cls.generate_client_identifier(inbound_id, client.id),
+                                "email": cls.generate_client_identifier(inbound_id, client.id),
+                                "password": cls.generate_client_identifier(inbound_id, client.id),
                                 "subId": client.id,
                                 "expiryTime": 0,
                                 "totalGB": 0,
@@ -117,8 +121,9 @@ class XUIRequest:
 
     @classmethod
     async def deactivate_client(cls, host: str, cookies: dict, inbound_id: int, client_id: str) -> bool:
+        target = cls.generate_client_identifier(inbound_id, client_id)
         result = await cls._send(
-            url=f"{host}/panel/api/inbounds/updateClient/{inbound_id}{client_id}",
+            url=f"{host}/panel/api/inbounds/updateClient/{target}",
             method="POST",
             cookies=cookies,
             json={
@@ -127,9 +132,9 @@ class XUIRequest:
                     {
                         "clients": [
                             {
-                                "id": f"{inbound_id}{client_id}",
-                                "email": f"{inbound_id}{client_id}",
-                                "password": f"{inbound_id}{client_id}",
+                                "id": target,
+                                "email": target,
+                                "password": target,
                                 "subId": client_id,
                                 "expiryTime": 0,
                                 "totalGB": 0,
@@ -144,8 +149,9 @@ class XUIRequest:
 
     @classmethod
     async def activate_client(cls, host: str, cookies: dict, inbound_id: int, client_id: str) -> bool:
+        target = cls.generate_client_identifier(inbound_id, client_id)
         result = await cls._send(
-            url=f"{host}/panel/api/inbounds/updateClient/{inbound_id}{client_id}",
+            url=f"{host}/panel/api/inbounds/updateClient/{target}",
             method="POST",
             cookies=cookies,
             json={
@@ -154,9 +160,9 @@ class XUIRequest:
                     {
                         "clients": [
                             {
-                                "id": f"{inbound_id}{client_id}",
-                                "email": f"{inbound_id}{client_id}",
-                                "password": f"{inbound_id}{client_id}",
+                                "id": target,
+                                "email": target,
+                                "password": target,
                                 "subId": client_id,
                                 "expiryTime": 0,
                                 "totalGB": 0,
@@ -178,8 +184,9 @@ class XUIRequest:
         client_id: str,
         client: ClientRequest,
     ) -> bool:
+        target = cls.generate_client_identifier(inbound_id, client_id)
         result = await cls._send(
-            url=f"{host}/panel/api/inbounds/updateClient/{inbound_id}{client.id}",
+            url=f"{host}/panel/api/inbounds/updateClient/{target}",
             method="POST",
             cookies=cookies,
             json={
@@ -188,9 +195,9 @@ class XUIRequest:
                     {
                         "clients": [
                             {
-                                "id": f"{inbound_id}{client_id}",
-                                "email": f"{inbound_id}{client_id}",
-                                "password": f"{inbound_id}{client_id}",
+                                "id": target,
+                                "email": target,
+                                "password": target,
                                 "subId": client_id,
                                 "enable": client.enable,
                                 "expiryTime": 0,

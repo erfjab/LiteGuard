@@ -23,9 +23,9 @@ async def subs_checkers() -> None:
                 for sub in subs:
                     client = clients.get(sub.server_key, None)
                     if not client:
-                        if not sub.availabled:
+                        if not sub.availabled or not server.availabled:
                             continue
-                        logger.info(f"Creating client for subscription {sub} on server {server.id}")
+                        logger.info(f"Creating client for subscription '{sub.remark}' on server {server.id}")
                         success = await XUIRequest.create_client(
                             host=server.api_host,
                             cookies=server.cookies,
@@ -33,7 +33,7 @@ async def subs_checkers() -> None:
                             clients=[ClientRequest(id=sub.server_key)],
                         )
                         if success:
-                            logger.info(f"Client for subscription {sub} created successfully on server {server.id}")
+                            logger.info(f"Client for subscription '{sub.remark}' created successfully on server {server.id}")
                         continue
                     await Subscription.upsert_usage(
                         db, sub_id=sub.id, server_id=server.id, inbound_id=inbound.id, client_id=client.id, usage=client.allTime
@@ -46,8 +46,23 @@ async def subs_checkers() -> None:
                             client_id=client.subId,
                         )
                         if success:
-                            logger.info(f"Client for removed subscription {sub} deleted successfully on server {server.id}")
+                            logger.info(
+                                f"Client for removed subscription '{sub.remark}' deleted successfully on server {server.id}"
+                            )
                         continue
+                    if not server.enabled:
+                        success = await XUIRequest.deactivate_client(
+                            host=server.api_host,
+                            cookies=server.cookies,
+                            inbound_id=inbound.id,
+                            client_id=client.subId,
+                        )
+                        if success:
+                            logger.info(
+                                f"Client for subscription '{sub.remark}' deactivated successfully on server {server.id}"
+                            )
+                        continue
+
                     if client.enable and not sub.availabled:
                         success = await XUIRequest.deactivate_client(
                             host=server.api_host,
@@ -56,7 +71,9 @@ async def subs_checkers() -> None:
                             client_id=client.subId,
                         )
                         if success:
-                            logger.info(f"Client for subscription {sub} deactivated successfully on server {server.id}")
+                            logger.info(
+                                f"Client for subscription '{sub.remark}' deactivated successfully on server {server.id}"
+                            )
                         continue
                     if not client.enable and sub.availabled:
                         success = await XUIRequest.activate_client(
@@ -66,5 +83,7 @@ async def subs_checkers() -> None:
                             client_id=client.subId,
                         )
                         if success:
-                            logger.info(f"Client for subscription {sub} re-activated successfully on server {server.id}")
+                            logger.info(
+                                f"Client for subscription '{sub.remark}' re-activated successfully on server {server.id}"
+                            )
                         continue

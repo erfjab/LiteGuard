@@ -34,7 +34,9 @@ async def server_update_handler(
         case SubActionType.CHANGE_CONFIG:
             text = DialogText.SERVERS_ENTER_CONFIG
             _state = ServerUpdateForm.input
-        case SubActionType.ENABLED_STATUS | SubActionType.REMOVE:
+        case SubActionType.REMOVE:
+            return await callback_query.answer(text=DialogText.ACTIONS_NOT_ALLOW, show_alert=True)
+        case SubActionType.ENABLED_STATUS:
             text = DialogText.ACTIONS_APPROVAL
             kb = BotKB.approval(section=SectionType.SERVERS, action=ActionType.UPDATE, target=server.id)
             _state = ServerUpdateForm.approval
