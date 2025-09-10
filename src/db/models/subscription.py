@@ -361,8 +361,12 @@ class Subscription(Base):
     async def get_all(
         cls,
         db: AsyncSession,
+        *,
+        removed: bool = False,
     ) -> List["Subscription"]:
         query = select(cls).options(selectinload(cls.usages), selectinload(cls.user)).order_by(cls.created_at.desc())
+        if removed is not None:
+            query = query.where(cls.removed == removed)
         result = await db.execute(query)
         return result.scalars().all()
 

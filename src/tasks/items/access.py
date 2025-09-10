@@ -1,8 +1,6 @@
-import logging
 from src.xui import XUIRequest
 from src.db import Server, GetDB
-
-logger = logging.getLogger(__name__)
+from src.config import logger
 
 
 async def access_generate():

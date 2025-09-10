@@ -186,9 +186,7 @@ class XUIManager:
     async def get_links(cls, servers: list[Server], sub: Subscription) -> list[str]:
         links = []
         for server in servers:
-            server_links = await XUIRequest.get_links(f"{server.sub_host}/{sub.server_key}")
-            for server_link in server_links:
-                links.append(cls.rename(server_link, server.id, sub.server_key))
+            links.extend(await XUIRequest.get_links(f"{server.sub_host}/{sub.server_key}"))
         return links
 
     @classmethod

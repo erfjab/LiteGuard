@@ -1,8 +1,8 @@
 import json
-import logging
 import base64
 from typing import Optional, Dict, List
 from httpx import AsyncClient, Response
+from src.config import logger
 from .types import Inbound, ClientRequest
 
 
@@ -33,10 +33,10 @@ class XUIRequest:
                 )
             response.raise_for_status()
             if not response.json().get("success"):
-                logging.error(f"Request to {url} failed [{json}]: {response.json().get('msg', 'Unknown error')}")
+                logger.error(f"Request to {url} failed [{json}]: {response.json().get('msg', 'Unknown error')}")
             return response.json()
         except Exception as e:
-            logging.error(f"Request to {url} failed: {e}")
+            logger.error(f"Request to {url} failed: {e}")
             return {"success": False, "msg": str(e), "obj": None}
 
     @classmethod
@@ -45,10 +45,14 @@ class XUIRequest:
             async with AsyncClient() as client:
                 response = await client.get(url=host)
             response.raise_for_status()
-            decode = base64.b64decode(response.read()).decode("utf-8")
+            content = response.read()
+            try:
+                decode = base64.b64decode(content).decode("utf-8")
+            except Exception:
+                decode = content.decode("utf-8")
             return [link.strip() for link in decode.split("\n") if link.strip()]
         except Exception as e:
-            logging.error(f"Request to {host} failed: {e}")
+            logger.error(f"Request to {host} failed: {e}")
             return []
 
     @classmethod
@@ -65,13 +69,17 @@ class XUIRequest:
                     return
                 return response
         except Exception as e:
-            logging.error(f"Login failed: {e}")
+            logger.error(f"Login failed: {e}")
             return
 
     @classmethod
     async def get_inbounds(cls, host: str, cookies: dict) -> Optional[List[Inbound]]:
         inbounds = await cls._send(url=f"{host}/panel/api/inbounds/list", method="GET", cookies=cookies)
-        return [Inbound(**item) for item in inbounds["obj"]] if inbounds["success"] else None
+        return (
+            [Inbound(**item) for item in inbounds["obj"] if item["protocol"] in ["vless", "vmess", "trojan", "shadowsocks"]]
+            if inbounds["success"]
+            else None
+        )
 
     @classmethod
     async def create_client(

@@ -1,8 +1,8 @@
-import logging
 from typing import Any, Callable, Dict, Awaitable
 from eiogram.middleware import BaseMiddleware
 from eiogram.types import Update
 from src.db import GetDB, User, UserMessage, Setting
+from src.config import logger
 
 
 class Middleware(BaseMiddleware):
@@ -21,7 +21,7 @@ class Middleware(BaseMiddleware):
             if update.message:
                 await UserMessage.add(update.message)
             if not dbuser.has_access:
-                logging.warning(f"User {dbuser.id} try to access bot without permission.")
+                logger.warning(f"User {dbuser.id} try to access bot without permission.")
                 return False
             setting = await Setting.get(db)
             data["setting"] = setting

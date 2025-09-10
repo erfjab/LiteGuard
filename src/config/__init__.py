@@ -14,6 +14,7 @@ from .env import (
     UVICORN_SSL_CERTFILE,
 )
 from .tg import BOT, DP
+from .log import logger
 
 __all__ = [
     "DOCS",
@@ -31,4 +32,5 @@ __all__ = [
     "UVICORN_PORT",
     "UVICORN_SSL_KEYFILE",
     "UVICORN_SSL_CERTFILE",
+    "logger",
 ]
