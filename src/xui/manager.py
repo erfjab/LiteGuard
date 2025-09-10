@@ -199,6 +199,8 @@ class XUIManager:
                 (V2Data(protocol="vless", remark=placeholder.format(**sub_info), address="127.0.0.0", port=1)).to_link()
                 for placeholder in setting.placeholders
             )
+        if len(links) == 0:
+            links.append((V2Data(protocol="vless", remark="✖️", address="127.0.0.1", port=1)).to_link())
         return links
 
     @classmethod
