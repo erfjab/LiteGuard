@@ -10,6 +10,7 @@ class DialogText(StrEnum):
     ACTIONS_APPROVAL = "⚠️ <b>Are you sure you want to proceed with this action?</b>"
     ACTIONS_FORGET = "❌ Action cancelled. No changes were made."
     ACTIONS_PROCESSING = "⏳ Processing your request. Please wait..."
+    ACTIONS_NOT_ALLOW = "❌ This action is not allowed."
 
     ### Servers
     SERVERS_MENU = "🖥 <b>Server Management</b>\nSelect a server to manage or add a new one."
