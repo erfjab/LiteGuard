@@ -7,7 +7,6 @@ async def subs_checkers() -> None:
     async with GetDB() as db:
         subs = await Subscription.get_all(db, removed=None)
         if not subs:
-            logger.info("No subscriptions found")
             return
         servers = await Server.get_all(db)
         if not servers:

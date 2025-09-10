@@ -116,7 +116,7 @@ async def approval_handler(
         update = await callback_query.message.answer(DialogText.SERVERS_NOT_FOUND, reply_markup=BotKB.subs_back())
         return await UserMessage.clear(update)
 
-    servers = await Server.get_all(db)
+    servers = await Server.get_all(db, availabled=True)
     if not servers:
         update = await callback_query.message.answer(text=DialogText.SUBS_NO_SERVERS, reply_markup=BotKB.subs_back())
         return await UserMessage.add(update)
