@@ -1,5 +1,6 @@
 import json
 import logging
+import base64
 from typing import Optional, Dict, List
 from httpx import AsyncClient, Response
 from .types import Inbound, ClientRequest
@@ -31,10 +32,24 @@ class XUIRequest:
                     params=params,
                 )
             response.raise_for_status()
+            if not response.json().get("success"):
+                logging.error(f"Request to {url} failed [{json}]: {response.json().get('msg', 'Unknown error')}")
             return response.json()
         except Exception as e:
             logging.error(f"Request to {url} failed: {e}")
             return {"success": False, "msg": str(e), "obj": None}
+
+    @classmethod
+    async def get_links(cls, host: str) -> List[str]:
+        try:
+            async with AsyncClient() as client:
+                response = await client.get(url=host)
+            response.raise_for_status()
+            decode = base64.b64decode(response.read()).decode("utf-8")
+            return [link.strip() for link in decode.split("\n") if link.strip()]
+        except Exception as e:
+            logging.error(f"Request to {host} failed: {e}")
+            return []
 
     @classmethod
     async def login(cls, host: str, username: str, password: str) -> Optional[Response]:
@@ -55,14 +70,8 @@ class XUIRequest:
 
     @classmethod
     async def get_inbounds(cls, host: str, cookies: dict) -> Optional[List[Inbound]]:
-        inbounds = await cls._send(
-            url=f"{host}/panel/api/inbounds/list", method="GET", cookies=cookies
-        )
-        return (
-            [Inbound(**item) for item in inbounds["obj"]]
-            if inbounds["success"]
-            else None
-        )
+        inbounds = await cls._send(url=f"{host}/panel/api/inbounds/list", method="GET", cookies=cookies)
+        return [Inbound(**item) for item in inbounds["obj"]] if inbounds["success"] else None
 
     @classmethod
     async def create_client(
@@ -71,9 +80,8 @@ class XUIRequest:
         cookies: dict,
         inbound_id: int,
         clients: List[ClientRequest],
-    ) -> Dict[str, str]:
-        print(client.id for client in clients)
-        return await cls._send(
+    ) -> bool:
+        result = await cls._send(
             url=f"{host}/panel/api/inbounds/addClient",
             method="POST",
             cookies=cookies,
@@ -83,8 +91,9 @@ class XUIRequest:
                     {
                         "clients": [
                             {
-                                "id": client.id,
-                                "email": client.id,
+                                "id": f"{inbound_id}{client.id}",
+                                "email": f"{inbound_id}{client.id}",
+                                "password": f"{inbound_id}{client.id}",
                                 "subId": client.id,
                                 "expiryTime": 0,
                                 "totalGB": 0,
@@ -96,13 +105,12 @@ class XUIRequest:
                 ),
             },
         )
+        return True if result["success"] else False
 
     @classmethod
-    async def deactivate_client(
-        cls, host: str, cookies: dict, inbound_id: int, client_id: str
-    ) -> Dict[str, str]:
-        return await cls._send(
-            url=f"{host}/panel/api/inbounds/updateClient/{client_id}",
+    async def deactivate_client(cls, host: str, cookies: dict, inbound_id: int, client_id: str) -> bool:
+        result = await cls._send(
+            url=f"{host}/panel/api/inbounds/updateClient/{inbound_id}{client_id}",
             method="POST",
             cookies=cookies,
             json={
@@ -111,8 +119,9 @@ class XUIRequest:
                     {
                         "clients": [
                             {
-                                "id": client_id,
-                                "email": client_id,
+                                "id": f"{inbound_id}{client_id}",
+                                "email": f"{inbound_id}{client_id}",
+                                "password": f"{inbound_id}{client_id}",
                                 "subId": client_id,
                                 "expiryTime": 0,
                                 "totalGB": 0,
@@ -123,13 +132,12 @@ class XUIRequest:
                 ),
             },
         )
+        return True if result["success"] else False
 
     @classmethod
-    async def activate_client(
-        cls, host: str, cookies: dict, inbound_id: int, client_id: str
-    ) -> Dict[str, str]:
-        return await cls._send(
-            url=f"{host}/panel/api/inbounds/updateClient/{client_id}",
+    async def activate_client(cls, host: str, cookies: dict, inbound_id: int, client_id: str) -> bool:
+        result = await cls._send(
+            url=f"{host}/panel/api/inbounds/updateClient/{inbound_id}{client_id}",
             method="POST",
             cookies=cookies,
             json={
@@ -138,8 +146,9 @@ class XUIRequest:
                     {
                         "clients": [
                             {
-                                "id": client_id,
-                                "email": client_id,
+                                "id": f"{inbound_id}{client_id}",
+                                "email": f"{inbound_id}{client_id}",
+                                "password": f"{inbound_id}{client_id}",
                                 "subId": client_id,
                                 "expiryTime": 0,
                                 "totalGB": 0,
@@ -150,6 +159,7 @@ class XUIRequest:
                 ),
             },
         )
+        return True if result["success"] else False
 
     @classmethod
     async def revoke_client(
@@ -159,9 +169,9 @@ class XUIRequest:
         inbound_id: int,
         client_id: str,
         client: ClientRequest,
-    ) -> Dict[str, str]:
-        return await cls._send(
-            url=f"{host}/panel/api/inbounds/updateClient/{client_id}",
+    ) -> bool:
+        result = await cls._send(
+            url=f"{host}/panel/api/inbounds/updateClient/{inbound_id}{client.id}",
             method="POST",
             cookies=cookies,
             json={
@@ -170,9 +180,10 @@ class XUIRequest:
                     {
                         "clients": [
                             {
-                                "id": client.id,
-                                "email": client.id,
-                                "subId": client.id,
+                                "id": f"{inbound_id}{client_id}",
+                                "email": f"{inbound_id}{client_id}",
+                                "password": f"{inbound_id}{client_id}",
+                                "subId": client_id,
                                 "enable": client.enable,
                                 "expiryTime": 0,
                                 "totalGB": 0,
@@ -182,23 +193,22 @@ class XUIRequest:
                 ),
             },
         )
+        return True if result["success"] else False
 
     @classmethod
-    async def remove_client(
-        cls, host: str, cookies: dict, inbound_id: int, client_id: str
-    ) -> Dict[str, str]:
-        return await cls._send(
-            url=f"{host}/panel/api/inbounds/{inbound_id}/delClient/{client_id}",
+    async def remove_client(cls, host: str, cookies: dict, inbound_id: int, client_id: str) -> bool:
+        result = await cls._send(
+            url=f"{host}/panel/api/inbounds/{inbound_id}/delClient/{inbound_id}{client_id}",
             method="POST",
             cookies=cookies,
         )
+        return True if result["success"] else False
 
     @classmethod
-    async def reset_client(
-        cls, host: str, cookies: dict, inbound_id: int, client_id: str
-    ) -> Dict[str, str]:
-        return await cls._send(
-            url=f"{host}/panel/api/inbounds/{inbound_id}/resetClientTraffic/{client_id}",
+    async def reset_client(cls, host: str, cookies: dict, inbound_id: int, client_id: str) -> bool:
+        result = await cls._send(
+            url=f"{host}/panel/api/inbounds/{inbound_id}/resetClientTraffic/{inbound_id}{client_id}",
             method="POST",
             cookies=cookies,
         )
+        return True if result["success"] else False

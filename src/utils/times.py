@@ -2,6 +2,8 @@ from datetime import datetime
 
 
 def time_diff(target: datetime, now: datetime = datetime.now()) -> str:
+    if not target:
+        return "➖"
     delta = target - now
     total_seconds = abs(int(delta.total_seconds()))
     is_future = delta.total_seconds() > 0

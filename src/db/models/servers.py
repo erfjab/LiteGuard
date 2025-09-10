@@ -27,15 +27,9 @@ class ServerAccess(Base):
 
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     access: Mapped[dict] = mapped_column(JSON)
-    server_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("servers.id"), nullable=False
-    )
-    updated_at: Mapped[Optional[datetime]] = mapped_column(
-        DateTime, onupdate=datetime.now, nullable=True
-    )
-    created_at: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.now, nullable=False
-    )
+    server_id: Mapped[int] = mapped_column(Integer, ForeignKey("servers.id"), nullable=False)
+    updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime, onupdate=datetime.now, nullable=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False)
 
 
 class Server(Base):
@@ -72,13 +66,19 @@ class Server(Base):
 
     @property
     def need_update_access(self) -> bool:
-        if not self.cookies:
+        if not self.server_access:
             return True
-        return self.server_access.updated_at > timedelta(hours=8)
+        if not self.server_access.updated_at:
+            return True
+        return (datetime.now() - self.server_access.updated_at) > timedelta(hours=8)
 
     @property
-    def host(self) -> Optional[str]:
-        return self.config.get("host") if self.config else None
+    def api_host(self) -> Optional[str]:
+        return self.config["host"] if self.config else None
+
+    @property
+    def sub_host(self) -> Optional[str]:
+        return self.config["sub"] if self.config else None
 
     @hybrid_property
     def availabled(self) -> bool:
@@ -121,9 +121,7 @@ class Server(Base):
         return result.scalars().first()
 
     @classmethod
-    async def get_paginated(
-        cls, db: AsyncSession, page: int, limit: int = 20
-    ) -> Pagination:
+    async def get_paginated(cls, db: AsyncSession, page: int, limit: int = 20) -> Pagination:
         total_result = await db.execute(
             select(func.count()).where(cls.removed == False).select_from(cls)  # noqa
         )
@@ -143,9 +141,7 @@ class Server(Base):
         items = result.scalars().all()
         back = current - 1 if current > 1 else None
         next = current + 1 if current < total_pages else None
-        return Pagination(
-            items=items, total=total_pages, current=current, back=back, next=next
-        )
+        return Pagination(items=items, total=total_pages, current=current, back=back, next=next)
 
     @classmethod
     async def get_all(
@@ -156,9 +152,7 @@ class Server(Base):
         availabled: Optional[bool] = None,
         removed: bool = False,
     ) -> List["Server"]:
-        query = (
-            select(cls).where(cls.removed == removed).order_by(cls.created_at.desc())
-        )
+        query = select(cls).where(cls.removed == removed).order_by(cls.created_at.desc())
 
         if availabled is not None:
             query = query.filter(cls.availabled == availabled)
@@ -186,12 +180,8 @@ class Server(Base):
         return item
 
     @classmethod
-    async def upsert_access(
-        cls, db: AsyncSession, server_id: int, access: dict
-    ) -> "ServerAccess":
-        result = await db.execute(
-            select(ServerAccess).where(ServerAccess.server_id == server_id)
-        )
+    async def upsert_access(cls, db: AsyncSession, server_id: int, access: dict) -> "ServerAccess":
+        result = await db.execute(select(ServerAccess).where(ServerAccess.server_id == server_id))
         server_access = result.scalars().first()
 
         if server_access:

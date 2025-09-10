@@ -5,8 +5,8 @@ class ButtonText(StrEnum):
     ### actions
     ACTIONS_BACK = "🔙 Back"
     ACTIONS_CREATE = "➕ Create"
-    ACTIONS_CONFIRM = "✅ Confirm"
-    ACTIONS_CANCEL = "❌ Cancel"
+    ACTIONS_YES = "✔️ Yes"
+    ACTIONS_NO = "✖️ No"
 
     ### pages
     PAGES_BACK = "⬅️"
@@ -29,3 +29,8 @@ class ButtonText(StrEnum):
     ACTIVATED = "✔️ Activated"
     DEACTIVATED = "✖️ Deactivated"
     REMOVE = "🗑️ Remove"
+    EXPIRE = "🕒 Expire"
+    USAGE_LIMIT = "📊 Usage Limit"
+    RESET_USAGE = "🔄 Reset Usage"
+    REVOKE = "🚫 Revoke"
+    QRCODE = "🆔 QR Code"

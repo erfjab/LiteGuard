@@ -26,3 +26,8 @@ class SubActionType(StrEnum):
     CHANGE_CONFIG = "cc"
     ENABLED_STATUS = "es"
     REMOVE = "rv"
+    EXPIRE = "ex"
+    USAGE_LIMIT = "ul"
+    RESET_USAGE = "ru"
+    REVOKE = "rk"
+    QRCODE = "qc"

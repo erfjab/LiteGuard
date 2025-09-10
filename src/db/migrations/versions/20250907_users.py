@@ -30,9 +30,7 @@ def upgrade() -> None:
         sa.Column("created_at", sa.DateTime(), nullable=False),
         sa.PrimaryKeyConstraint("id"),
     )
-    op.create_index(
-        op.f("ix_user_messages_user_id"), "user_messages", ["user_id"], unique=False
-    )
+    op.create_index(op.f("ix_user_messages_user_id"), "user_messages", ["user_id"], unique=False)
     op.create_table(
         "user_states",
         sa.Column("id", sa.BigInteger(), autoincrement=True, nullable=False),

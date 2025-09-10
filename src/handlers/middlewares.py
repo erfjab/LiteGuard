@@ -21,9 +21,7 @@ class Middleware(BaseMiddleware):
             if update.message:
                 await UserMessage.add(update.message)
             if not dbuser.has_access:
-                logging.warning(
-                    f"User {dbuser.id} try to access bot without permission."
-                )
+                logging.warning(f"User {dbuser.id} try to access bot without permission.")
                 return False
             setting = await Setting.get(db)
             data["setting"] = setting
