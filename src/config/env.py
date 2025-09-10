@@ -20,6 +20,8 @@ SQLALCHEMY_DATABASE_URL = (
 TELEGRAM_API_TOKEN = config("TELEGRAM_API_TOKEN", default="", cast=str)
 TELEGRAM_ADMINS_ID = config("TELEGRAM_ADMINS_ID", cast=Csv(int)) or []
 TELEGRAM_LOGGER_GROUP_ID = config("TELEGRAM_LOGGER_GROUP_ID", default=0, cast=int)
+TELEGRAM_WEBHOOK_HOST = config("TELEGRAM_WEBHOOK_HOST", default="", cast=str)
+TELEGRAM_WEBHOOK_SECRET_KEY = config("TELEGRAM_WEBHOOK_SECRET_KEY", default="", cast=str)
 
 ### Subscription Settings
 SUBSCRIPTION_DOMAIN_PREFIX = config("SUBSCRIPTION_DOMAIN_PREFIX", default="", cast=str)

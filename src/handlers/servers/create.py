@@ -39,13 +39,13 @@ async def server_remark_handler(message: Message, db: AsyncSession, state: State
 @router.message(StateFilter(ServerCreateForm.config), Text())
 async def server_config_handler(message: Message, db: AsyncSession, state: StateManager, state_data: dict):
     messages = message.text.split()
-    if len(messages) != 3:
+    if len(messages) != 4:
         update = await message.answer(
             text=DialogText.SERVERS_INVALID_CONFIG_FORMAT,
         )
         return await UserMessage.add(update)
 
-    access = await XUIRequest.login(host=messages[2], username=messages[0], password=messages[1])
+    access = await XUIRequest.login(host=messages[2].strip("/"), username=messages[0], password=messages[1])
     if not access:
         update = await message.answer(
             text=DialogText.SERVERS_INVALID_ACCESS,
@@ -55,7 +55,12 @@ async def server_config_handler(message: Message, db: AsyncSession, state: State
     server = await Server.create(
         db,
         remark=state_data["remark"],
-        config={"host": messages[2], "username": messages[0], "password": messages[1]},
+        config={
+            "host": messages[2].strip("/"),
+            "username": messages[0],
+            "password": messages[1],
+            "sub": messages[3].strip("/"),
+        },
     )
     await Server.upsert_access(db, server_id=server.id, access=dict(access.cookies))
     await state.clear_state(db=db)

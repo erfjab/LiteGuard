@@ -73,8 +73,12 @@ class Server(Base):
         return (datetime.now() - self.server_access.updated_at) > timedelta(hours=8)
 
     @property
-    def host(self) -> Optional[str]:
-        return self.config.get("host") if self.config else None
+    def api_host(self) -> Optional[str]:
+        return self.config["host"] if self.config else None
+
+    @property
+    def sub_host(self) -> Optional[str]:
+        return self.config["sub"] if self.config else None
 
     @hybrid_property
     def availabled(self) -> bool:

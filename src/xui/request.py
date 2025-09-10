@@ -1,5 +1,6 @@
 import json
 import logging
+import base64
 from typing import Optional, Dict, List
 from httpx import AsyncClient, Response
 from .types import Inbound, ClientRequest
@@ -37,6 +38,18 @@ class XUIRequest:
         except Exception as e:
             logging.error(f"Request to {url} failed: {e}")
             return {"success": False, "msg": str(e), "obj": None}
+
+    @classmethod
+    async def get_links(cls, host: str) -> List[str]:
+        try:
+            async with AsyncClient() as client:
+                response = await client.get(url=host)
+            response.raise_for_status()
+            decode = base64.b64decode(response.read()).decode("utf-8")
+            return [link.strip() for link in decode.split("\n") if link.strip()]
+        except Exception as e:
+            logging.error(f"Request to {host} failed: {e}")
+            return []
 
     @classmethod
     async def login(cls, host: str, username: str, password: str) -> Optional[Response]:

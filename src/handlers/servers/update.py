@@ -61,13 +61,13 @@ async def input_handler(message: Message, db: AsyncSession, state_data: dict, st
             await Server.update(db, server=server, remark=message.text)
         case SubActionType.CHANGE_CONFIG:
             messages = message.text.split()
-            if len(messages) != 3:
+            if len(messages) != 4:
                 update = await message.answer(
                     text=DialogText.SERVERS_INVALID_CONFIG_FORMAT,
                 )
                 return await UserMessage.add(update)
 
-            access = await XUIRequest.login(host=messages[2], username=messages[0], password=messages[1])
+            access = await XUIRequest.login(host=messages[2].strip("/"), username=messages[0], password=messages[1])
             if not access:
                 update = await message.answer(
                     text=DialogText.SERVERS_INVALID_ACCESS,
@@ -80,7 +80,8 @@ async def input_handler(message: Message, db: AsyncSession, state_data: dict, st
                 config={
                     "username": messages[0],
                     "password": messages[1],
-                    "host": messages[2],
+                    "host": messages[2].strip("/"),
+                    "sub": messages[3].strip("/"),
                 },
             )
 

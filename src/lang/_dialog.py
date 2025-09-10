@@ -24,7 +24,7 @@ class DialogText(StrEnum):
     )
     SERVERS_NOT_FOUND = "❌ No server found."
     SERVERS_ENTER_REMARK = "📝 <b>Enter a remark for the server:</b>\nThis helps you identify the server later."
-    SERVERS_ENTER_CONFIG = "💻 <b>Enter the server configuration:</b>\n\n- username\n- password \n- host [{http or https}://{ip or domain}:{port}/{path}]\n\n<b>like:</b>\n<code>erfan erfan http://57.107.24.58:33431/u6QpcCkB5q8YdtGUx8</code>\n<code>admin admin https://dash.netshop.com:443/sd54ueRvx</code>"
+    SERVERS_ENTER_CONFIG = "💻 <b>Enter the server configuration:</b>\n\n- username\n- password \n- host [{http or https}://{ip or domain}:{port}/{path}]\n- sub [{http or https}://{ip or domain}:{port}/{path}]\n\n<b>like:</b>\n<code>erfan erfan http://57.107.24.58:33431/u6QpcCkB5q8YdtGUx8 http://57.107.24.58:2096/sub </code>\n<code>admin admin https://dash.netshop.com:443/sd54ueRvx https://dash.netshop.com:443/sub </code>"
     SERVERS_REMARK_EXISTS = "❌ A server with this remark already exists. Please choose a different remark."
     SERVERS_INVALID_ACCESS = "❌ Failed to connect to the server. Please check the configuration and try again."
     SERVERS_INVALID_CONFIG_FORMAT = "❌ Invalid configuration format. Please follow the example provided."
