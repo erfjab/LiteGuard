@@ -5,6 +5,7 @@ import json
 import urllib
 from v2share import V2Data
 from src.db import Server, Subscription, Setting
+from src.config import logger
 from .request import XUIRequest
 from .types import ClientRequest, Inbound
 
@@ -188,18 +189,25 @@ class XUIManager:
         links = []
         sub_info = sub.config_format()
         if sub.availabled:
-            links.extend(
-                (V2Data(protocol="vless", remark=info.format(**sub_info), address="127.0.0.0", port=1)).to_link()
-                for info in setting.informations
-            )
+            try:
+                links.extend(
+                    (V2Data(protocol="vless", remark=info.format(**sub_info), address="127.0.0.1", port=1)).to_link()
+                    for info in setting.informations
+                )
+            except Exception as e:
+                logger.error(f"Error formatting information: {e}")
+
             if servers:
                 for server in servers:
                     links.extend(await XUIRequest.get_links(f"{server.sub_host}/{sub.server_key}"))
         else:
-            links.extend(
-                (V2Data(protocol="vless", remark=placeholder.format(**sub_info), address="127.0.0.0", port=1)).to_link()
-                for placeholder in setting.placeholders
-            )
+            try:
+                links.extend(
+                    (V2Data(protocol="vless", remark=placeholder.format(**sub_info), address="127.0.0.1", port=1)).to_link()
+                    for placeholder in setting.placeholders
+                )
+            except Exception as e:
+                logger.error(f"Error formatting placeholder: {e}")
         if len(links) == 0:
             links.append((V2Data(protocol="vless", remark="✖️", address="127.0.0.1", port=1)).to_link())
         if setting.shuffle:
