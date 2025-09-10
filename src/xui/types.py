@@ -6,6 +6,7 @@ from pydantic import BaseModel, model_validator
 class InboundClientSetting(BaseModel):
     email: str
     enable: bool
+    subId: str = ""
 
 
 class InboundSettings(BaseModel):
@@ -22,6 +23,7 @@ class ClientStats(BaseModel):
     down: int
     total: int
     allTime: int
+    subId: str
     reset: int
 
 
@@ -51,4 +53,6 @@ class Inbound(BaseModel):
                     if client_stat["email"] in settings_clients_map:
                         client_setting = settings_clients_map[client_stat["email"]]
                         client_stat["enable"] = client_setting.enable
+                        client_stat["subId"] = client_setting.subId
+
         return data
