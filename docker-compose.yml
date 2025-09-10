@@ -4,6 +4,8 @@ services:
     restart: always
     env_file:
       - .env
+    volumes:
+      - ./data/:/code/data/
     network_mode: "host"
 
   postgres:

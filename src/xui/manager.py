@@ -1,5 +1,6 @@
 import asyncio
 import base64
+import random
 import json
 import urllib
 from v2share import V2Data
@@ -201,6 +202,8 @@ class XUIManager:
             )
         if len(links) == 0:
             links.append((V2Data(protocol="vless", remark="✖️", address="127.0.0.1", port=1)).to_link())
+        if setting.shuffle:
+            random.shuffle(links)
         return links
 
     @classmethod
