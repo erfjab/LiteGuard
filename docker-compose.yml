@@ -1,0 +1,22 @@
+services:
+  liteguard:
+    image: ghcr.io/erfjab/liteguard:latest
+    restart: always
+    env_file:
+      - .env
+    network_mode: "host"
+
+  postgres:
+    image: postgres:15-alpine
+    restart: always
+    environment:
+      POSTGRES_DB: ${DATABASE_NAME:-liteguard}
+      POSTGRES_USER: ${DATABASE_USERNAME:-liteguard}
+      POSTGRES_PASSWORD: ${DATABASE_PASSWORD:-liteguard}
+      PGPORT: ${DATABASE_PORT:-5432}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    network_mode: "host"
+
+volumes:
+  postgres_data:
