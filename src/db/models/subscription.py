@@ -205,6 +205,7 @@ class Subscription(Base):
         now = datetime.now()
         return {
             "id": self.id,
+            "emoji": self.emoji,
             "remark": self.remark,
             "access_key": self.access_key,
             "server_key": self.server_key,
@@ -223,6 +224,19 @@ class Subscription(Base):
             "last_sub_updated_at": time_diff(self.last_sub_updated_at, now),
             "online_at": time_diff(self.online_at, now),
             "server_usages": server_usage_str,
+        }
+
+    def config_format(self) -> Dict:
+        return {
+            "ID": self.id,
+            "EMOJI": self.emoji,
+            "REMARK": self.remark,
+            "AVAILABLED": self.availabled,
+            "EXPIRE": self.expire_day,
+            "LIMIT_USAGE": f"{round((self.limit_usage / (1024**3)), 3)} GB" if self.limit_usage else "➖",
+            "CURRENT_USAGE": f"{round((self.current_usage / (1024**3)), 3)} GB" if self.current_usage else "➖",
+            "LIFETIME_USAGE": f"{round((self.lifetime_usage / (1024**3)), 3)} GB" if self.lifetime_usage else "➖",
+            "LEFT_USAGE": self.left_usage_gb,
         }
 
     @classmethod

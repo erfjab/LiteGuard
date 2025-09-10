@@ -2,8 +2,8 @@ import asyncio
 import base64
 import json
 import urllib
-
-from src.db import Server, Subscription
+from v2share import V2Data
+from src.db import Server, Subscription, Setting
 from .request import XUIRequest
 from .types import ClientRequest, Inbound
 
@@ -183,10 +183,22 @@ class XUIManager:
         return success_revoked == planned
 
     @classmethod
-    async def get_links(cls, servers: list[Server], sub: Subscription) -> list[str]:
+    async def get_links(cls, servers: list[Server], sub: Subscription, setting: Setting) -> list[str]:
         links = []
-        for server in servers:
-            links.extend(await XUIRequest.get_links(f"{server.sub_host}/{sub.server_key}"))
+        sub_info = sub.config_format()
+        if sub.availabled:
+            links.extend(
+                (V2Data(protocol="vless", remark=info.format(**sub_info), address="127.0.0.0", port=1)).to_link()
+                for info in setting.informations
+            )
+            if servers:
+                for server in servers:
+                    links.extend(await XUIRequest.get_links(f"{server.sub_host}/{sub.server_key}"))
+        else:
+            links.extend(
+                (V2Data(protocol="vless", remark=placeholder.format(**sub_info), address="127.0.0.0", port=1)).to_link()
+                for placeholder in setting.placeholders
+            )
         return links
 
     @classmethod
