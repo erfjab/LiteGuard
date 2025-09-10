@@ -28,23 +28,31 @@ curl -fsSL https://get.docker.com | sh
 
 #### 1. Create Directory and Download Files  
 ```bash
-mkdir -p /opt/erfjab/liteguard
+mkdir -p /opt/erfjab/liteguard/data
 curl -o /opt/erfjab/liteguard/docker-compose.yml https://raw.githubusercontent.com/erfjab/liteguard/master/docker-compose.yml
 cd /opt/erfjab/liteguard
 curl -o .env https://raw.githubusercontent.com/erfjab/liteguard/master/.env.example
 ```
 
-#### 2. Config .env
+#### 2. SSL Configuration
+
+Before configuring the environment, you need to set up SSL certificates for your domain. The SSL files must be placed in the `/opt/erfjab/liteguard/data` directory.
+
+For obtaining SSL certificates, you can use the [ESSL repository](https://github.com/erfjab/ESSL) which provides automated SSL certificate generation.
+
+**Important:** Make sure port 443 is open and available on your server, as the project requires it. If port 443 is occupied by another service (like Nginx or HAProxy), you'll need to configure those services to work alongside LiteGuard or use a different configuration.
+
+#### 3. Config .env
 ```bash
 nano .env
 ```
 
-#### 3. Pull Docker Image  
+#### 4. Pull Docker Image  
 ```bash
 docker compose pull
 ```
 
-#### 4. Start the Bot  
+#### 5. Start the Bot  
 ```bash
 docker compose up -d
 ```
