@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta
 from typing import Optional, Dict, TYPE_CHECKING, List
+from xmlrpc.client import Server
 from sqlalchemy import (
     String,
     DateTime,
@@ -21,6 +22,7 @@ from ..core import Base
 
 if TYPE_CHECKING:
     from .user import User
+    from .servers import Server
 
 
 class SubscriptionUsage(Base):
@@ -37,6 +39,8 @@ class SubscriptionUsage(Base):
 
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.now, nullable=False)
     updated_at: Mapped[Optional[datetime]] = mapped_column(DateTime, default=datetime.now, onupdate=datetime.now, nullable=True)
+
+    server: Mapped["Server"] = relationship("Server", back_populates=None, lazy="selectin")
 
 
 class Subscription(Base):

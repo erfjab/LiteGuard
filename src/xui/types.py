@@ -23,7 +23,7 @@ class ClientStats(BaseModel):
     down: int
     total: int
     allTime: int
-    subId: str
+    subId: str = ""
     reset: int
 
 
