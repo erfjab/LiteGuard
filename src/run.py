@@ -1,4 +1,3 @@
-import logging
 from copy import deepcopy
 from uvicorn import Config, Server
 from uvicorn.config import LOGGING_CONFIG
@@ -11,13 +10,12 @@ from src.config import (
     DP,
     TELEGRAM_WEBHOOK_HOST,
     TELEGRAM_WEBHOOK_SECRET_KEY,
+    logger,
 )
 from src.api import API
 from src.utils.state import DatabaseStorage
 from src.handlers import setup_handlers
 from src.tasks import TaskManager
-
-logger = logging.getLogger(__name__)
 
 
 def get_log_config():

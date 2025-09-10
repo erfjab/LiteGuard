@@ -1,4 +1,3 @@
-import logging
 from datetime import datetime
 from typing import Optional, Dict, Any, Union
 from eiogram.types import User as EioUser, Message, CallbackQuery
@@ -7,7 +6,7 @@ from sqlalchemy.sql import select, delete
 from sqlalchemy.orm import Mapped, mapped_column
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from src.config import BOT, TELEGRAM_ADMINS_ID
+from src.config import BOT, TELEGRAM_ADMINS_ID, logger
 from src.utils.times import time_diff
 from src.utils.pagination import Pagination
 from ..core import Base, GetDB
@@ -58,7 +57,7 @@ class UserMessage(Base):
                 try:
                     await BOT.delete_messages(chat_id=user_id, message_ids=message_ids)
                 except Exception as e:
-                    logging.warning(f"Failed to delete messages: {e}")
+                    logger.warning(f"Failed to delete messages: {e}")
             await db.execute(delete(UserMessage).where(delete_condition))
             message = update.message if isinstance(update, CallbackQuery) else update
             db.add(UserMessage(user_id=message.chat.id, message_id=message.message_id))

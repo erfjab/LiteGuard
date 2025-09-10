@@ -42,8 +42,13 @@ class Inbound(BaseModel):
     @model_validator(mode="before")
     @classmethod
     def merge_client_enable_status(cls, data):
-        if "settings" in data and isinstance(data["settings"], str):
-            settings_data = json.loads(data["settings"])
+        if "settings" in data:
+            if isinstance(data["settings"], InboundSettings):
+                return data
+            elif isinstance(data["settings"], dict):
+                settings_data = data["settings"]
+            elif isinstance(data["settings"], str):
+                settings_data = json.loads(data["settings"])
             inbound_settings = InboundSettings.model_validate(settings_data)
 
             settings_clients_map = {client.email: client for client in inbound_settings.clients}
