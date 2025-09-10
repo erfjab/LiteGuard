@@ -22,7 +22,7 @@ class SubCreateForm(StateGroup):
     BotCB.filter(section=SectionType.SUBS, action=ActionType.CREATE),
 )
 async def sub_create_handler(callback_query: CallbackQuery, db: AsyncSession, state: StateManager):
-    servers = await Server.get_all(db)
+    servers = await Server.get_all(db, availabled=True)
     if not servers:
         return await callback_query.answer(
             text=DialogText.SUBS_NO_SERVERS,
@@ -87,7 +87,7 @@ async def sub_limit_usage_handler(message: Message, db: AsyncSession, state: Sta
             text=DialogText.SUBS_INVALID_LIMIT_USAGE,
         )
         return await UserMessage.add(update)
-    servers = await Server.get_all(db)
+    servers = await Server.get_all(db, availabled=True)
     if not servers:
         update = await message.answer(
             text=DialogText.SUBS_NO_SERVERS,

@@ -26,7 +26,7 @@ class SimpleScheduler:
         )
         self.scheduler.add_job(
             self._wrap_coroutine(subs_checkers),
-            trigger=IntervalTrigger(seconds=10),
+            trigger=IntervalTrigger(seconds=100),
             id="subs_checkers",
             replace_existing=False,
         )

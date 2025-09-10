@@ -10,7 +10,7 @@ async def _get_db():
 
 
 async def get_servers(db: AsyncSession = Depends(_get_db)):
-    servers = await Server.get_all(db)
+    servers = await Server.get_all(db, availabled=True)
     if not servers:
         raise HTTPException(status_code=404, detail="Hosting not found")
     return servers
